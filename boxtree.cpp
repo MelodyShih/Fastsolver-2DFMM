@@ -4,43 +4,43 @@
 using namespace std;
 
 /* Given a reference (pointer to pointer)
-to the head of a list and an int,
-inserts a new node  on the fr ont of the list. */
+   to the head of a list and an int,
+   inserts a new node  on the fr ont of the list. */
 void push(Node** head_ref, Box* new_data)
 {
-    Node* new_node = new Node();
-    new_node->data = new_data;
-    new_node->next = (*head_ref);
-    (*head_ref) = new_node;
+	Node* new_node = new Node();
+	new_node->data = new_data;
+	new_node->next = (*head_ref);
+	(*head_ref) = new_node;
 }
 
 void Box::buildtree(int numlevel)
 {
-    if(numlevel==0)
-        return;
+	if(numlevel==0)
+		return;
 	int i = this->i;
 	int j = this->j;
-    this->topleft  = new Box(this->level+1, 2*i+1, 2*j, 2);
-    this->topleft->parent = this;
+	this->topleft  = new Box(this->level+1, 2*i+1, 2*j, 2);
+	this->topleft->parent = this;
 
-    this->topright = new Box(this->level+1, 2*i+1, 2*j+1, 3);
-    this->topright->parent = this;
+	this->topright = new Box(this->level+1, 2*i+1, 2*j+1, 3);
+	this->topright->parent = this;
 
-    this->botleft  = new Box(this->level+1, 2*i, 2*j, 0);
-    this->botleft->parent = this;
+	this->botleft  = new Box(this->level+1, 2*i, 2*j, 0);
+	this->botleft->parent = this;
 
-    this->botright = new Box(this->level+1, 2*i, 2*j+1, 1);
-    this->botright->parent = this;
+	this->botright = new Box(this->level+1, 2*i, 2*j+1, 1);
+	this->botright->parent = this;
 
-    this->topright->nextsibling = this->botleft;
-    this->topleft->nextsibling  = this->topright;
-    this->botright->nextsibling = this->topleft;
-    this->botleft->nextsibling  = this->botright;
+	this->topright->nextsibling = this->botleft;
+	this->topleft->nextsibling  = this->topright;
+	this->botright->nextsibling = this->topleft;
+	this->botleft->nextsibling  = this->botright;
 
-    this->topleft->buildtree(numlevel-1);
-    this->topright->buildtree(numlevel-1);
-    this->botleft->buildtree(numlevel-1);
-    this->botright->buildtree(numlevel-1);
+	this->topleft->buildtree(numlevel-1);
+	this->topright->buildtree(numlevel-1);
+	this->botleft->buildtree(numlevel-1);
+	this->botright->buildtree(numlevel-1);
 };
 
 void Box::buildneighborinteractionlist()
@@ -117,44 +117,44 @@ void Box::buildneighborinteractionlist()
 				for(int j=0; j<4; j++){
 					// check that if boxnow's sibling touch this box's parent
 					assert(boxnow->level == this->parent->level);
-				    if(abs(this->parent->i - boxnow->i) <= 1 &&
-				       abs(this->parent->j - boxnow->j) <= 1){
-			            //parent sibling's topleft
-			            boxtoadd = boxnow->topleft;
-			            if(abs(this->i-boxtoadd->i) <= 1 && 
-						   abs(this->j-boxtoadd->j) <= 1){
-			            	push(&this->neighbor, boxtoadd);
-			            }else{
-			            	push(&this->interaction, boxtoadd);
-			            }
+					if(abs(this->parent->i - boxnow->i) <= 1 &&
+							abs(this->parent->j - boxnow->j) <= 1){
+						//parent sibling's topleft
+						boxtoadd = boxnow->topleft;
+						if(abs(this->i-boxtoadd->i) <= 1 && 
+								abs(this->j-boxtoadd->j) <= 1){
+							push(&this->neighbor, boxtoadd);
+						}else{
+							push(&this->interaction, boxtoadd);
+						}
 
-			            //topright
-			            boxtoadd = boxnow->topright;
-			            if(abs(this->i-boxtoadd->i) <= 1 && 
-						   abs(this->j-boxtoadd->j) <= 1){
-			            	push(&this->neighbor, boxtoadd);
-			            }else{
-			            	push(&this->interaction, boxtoadd);
-			            }
+						//topright
+						boxtoadd = boxnow->topright;
+						if(abs(this->i-boxtoadd->i) <= 1 && 
+								abs(this->j-boxtoadd->j) <= 1){
+							push(&this->neighbor, boxtoadd);
+						}else{
+							push(&this->interaction, boxtoadd);
+						}
 
-			            //botleft
-			            boxtoadd = boxnow->botleft;
-			            if(abs(this->i-boxtoadd->i) <= 1 && 
-						   abs(this->j-boxtoadd->j) <= 1){
-			            	push(&this->neighbor, boxtoadd);
-			            }else{
-			            	push(&this->interaction, boxtoadd);
-			            }
+						//botleft
+						boxtoadd = boxnow->botleft;
+						if(abs(this->i-boxtoadd->i) <= 1 && 
+								abs(this->j-boxtoadd->j) <= 1){
+							push(&this->neighbor, boxtoadd);
+						}else{
+							push(&this->interaction, boxtoadd);
+						}
 
-			            //botright
-			            boxtoadd = boxnow->botright;
-			            if(abs(this->i-boxtoadd->i) <= 1 && 
-						   abs(this->j-boxtoadd->j) <= 1){
-			            	push(&this->neighbor, boxtoadd);
-			            }else{
-			            	push(&this->interaction, boxtoadd);
-			            }
-				    }
+						//botright
+						boxtoadd = boxnow->botright;
+						if(abs(this->i-boxtoadd->i) <= 1 && 
+								abs(this->j-boxtoadd->j) <= 1){
+							push(&this->neighbor, boxtoadd);
+						}else{
+							push(&this->interaction, boxtoadd);
+						}
+					}
 					boxnow = boxnow->nextsibling;
 				}
 				boxparentnow = boxparentnow->nextsibling; 
@@ -210,22 +210,22 @@ void performeaction(int action, Box* box)
 {
 	switch (action)
 	{
-    	case 1:
-        	box->buildneighborinteractionlist();
+		case 1:
+			box->buildneighborinteractionlist();
 			break;
-    	case 2:
-        	box->printneighborlist();
-        	break;
+		case 2:
+			box->printneighborlist();
+			break;
 		case 3:
-        	box->printinteractionlist();
-        	break;
+			box->printinteractionlist();
+			break;
 		case 4:
-		    box->computeoutcomingexp();	
+			box->computeoutcomingexp();	
 			break;
 		case 5:
-		    box->computeincomingexp();	
+			box->computeincomingexp();	
 			break;
-    	default: // code to be executed if n doesn't match any cases
+		default: // code to be executed if n doesn't match any cases
 			for(int l=0; l<box->level; l++)
 				cout<<"  ";
 			cout<<"box ("<<box->i<<","<<box->j<<")"<<endl;
@@ -274,7 +274,7 @@ void Box::computeoutcomingexp()
 {
 	// Case 1: Box is on the leaf of the tree
 	// Apply outgoing-from-sources map T_tau^{ofs}, see (7.2)
-	
+
 
 	// Case 2: Box is a parent of 4 nodes
 	// Apply outgoing from outgoing map T_tau^{ofo}, see (7.3)
@@ -285,12 +285,12 @@ void Box::computeincomingexp()
 {
 	// Case 1: level 0
 	// uhat = 0
-	
-	
+
+
 	// Case 2: all other levels
-    // Apply T_tau,parent^{ifi} to uhat_parent
-	
-	
+	// Apply T_tau,parent^{ifi} to uhat_parent
+
+
 	// Loop through all the boxes in the interaction list sigma
-    // Apply T_tau,sigma^{ifo} to qhat
+	// Apply T_tau,sigma^{ifo} to qhat
 }
