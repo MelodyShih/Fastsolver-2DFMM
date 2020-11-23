@@ -9,8 +9,14 @@ int main()
     rootbox->buildtree(level); 
 
 	rootbox->treetraverse(1);//build neighborinterationlist
-	//rootbox->treetraverse(2);//print neighborlist
+	rootbox->treetraverse(2);//print neighborlist
 	rootbox->treetraverse(3);//print interactionlist
+
+	cout<<"Downward pass:"<<endl;
+	rootbox->downwardpass(0);
+	cout<<endl;
+	cout<<"Upward pass:"<<endl;
+	rootbox->upwardpass(0);
 
     return 0;
 }

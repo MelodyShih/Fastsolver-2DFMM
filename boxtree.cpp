@@ -14,9 +14,9 @@ void push(Node** head_ref, Box* new_data)
     (*head_ref) = new_node;
 }
 
-void Box::buildtree(int level)
+void Box::buildtree(int numlevel)
 {
-    if(level==0)
+    if(numlevel==0)
         return;
 	int i = this->i;
 	int j = this->j;
@@ -37,10 +37,10 @@ void Box::buildtree(int level)
     this->botright->nextsibling = this->topleft;
     this->botleft->nextsibling  = this->botright;
 
-    this->topleft->buildtree(level-1);
-    this->topright->buildtree(level-1);
-    this->botleft->buildtree(level-1);
-    this->botright->buildtree(level-1);
+    this->topleft->buildtree(numlevel-1);
+    this->topright->buildtree(numlevel-1);
+    this->botleft->buildtree(numlevel-1);
+    this->botright->buildtree(numlevel-1);
 };
 
 void Box::buildneighborinteractionlist()
@@ -219,10 +219,16 @@ void performeaction(int action, Box* box)
 		case 3:
         	box->printinteractionlist();
         	break;
+		case 4:
+		    box->computeoutcomingexp();	
+			break;
+		case 5:
+		    box->computeincomingexp();	
+			break;
     	default: // code to be executed if n doesn't match any cases
-			cout<<"box ("<<box->i<<","<<box->j<<")"
-				<<" on level "<<box->level
-				<<endl;
+			for(int l=0; l<box->level; l++)
+				cout<<"  ";
+			cout<<"box ("<<box->i<<","<<box->j<<")"<<endl;
 	}
 }
 
@@ -237,4 +243,54 @@ void Box::treetraverse(int action)
 	this->topleft->treetraverse(action);
 	this->topright->treetraverse(action);
 	performeaction(action, this);
+}
+
+void Box::downwardpass(int action)
+{
+	if(this->botleft == NULL){ 
+		return;
+	}
+	performeaction(action, this);
+	this->botleft ->downwardpass(action);
+	this->botright->downwardpass(action);
+	this->topleft ->downwardpass(action);
+	this->topright->downwardpass(action);
+}
+
+void Box::upwardpass(int action)
+{
+	if(this->botleft == NULL){ 
+		performeaction(action, this);
+		return;
+	}
+	this->botleft ->upwardpass(action);
+	this->botright->upwardpass(action);
+	this->topleft ->upwardpass(action);
+	this->topright->upwardpass(action);
+	performeaction(action, this);
+}
+
+void Box::computeoutcomingexp()
+{
+	// Case 1: Box is on the leaf of the tree
+	// Apply outgoing-from-sources map T_tau^{ofs}, see (7.2)
+	
+
+	// Case 2: Box is a parent of 4 nodes
+	// Apply outgoing from outgoing map T_tau^{ofo}, see (7.3)
+	// (get from looping through its child)
+}
+
+void Box::computeincomingexp()
+{
+	// Case 1: level 0
+	// uhat = 0
+	
+	
+	// Case 2: all other levels
+    // Apply T_tau,parent^{ifi} to uhat_parent
+	
+	
+	// Loop through all the boxes in the interaction list sigma
+    // Apply T_tau,sigma^{ifo} to qhat
 }
