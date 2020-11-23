@@ -1,2 +1,2 @@
-# MATH2011-Finalproject
-This is an implementation of Fast multipole method in 2D 
+# Fastsolver-2DFMM
+Codes for course MATH2011 Fast solvers final project. An implementation of Fast multipole method in 2D. 
