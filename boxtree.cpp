@@ -8,16 +8,9 @@ to the head of a list and an int,
 inserts a new node  on the fr ont of the list. */
 void push(Node** head_ref, Box* new_data)
 {
-    /* 1. allocate node */
     Node* new_node = new Node();
-
-    /* 2. put in the data */
     new_node->data = new_data;
-
-    /* 3. Make next of new node as head */
     new_node->next = (*head_ref);
-
-    /* 4. move the head to point to the new node */
     (*head_ref) = new_node;
 }
 
@@ -64,21 +57,11 @@ void Box::buildneighborinteractionlist()
 		if(boxnow->nextsibling == NULL){
 			break;
 		}
-#ifdef DEBUG
-		cout<<"box ("<<this->i<<","<<this->j<<")"
-			<<" on level "<<boxnow->nextsibling->level
-			<<endl;
-#endif
 		push(&this->neighbor, boxnow->nextsibling);
-#ifdef DEBUG
-		cout<<"    ("<<boxnow->nextsibling->i<<","<<boxnow->nextsibling->j<<")"
-			<<" on level "<<boxnow->nextsibling->level
-			<<endl;
-#endif
 		boxnow = boxnow->nextsibling; 
 	}
 
-	// Case 1: boxes from parent siblings (all must be in either neighbor or
+	// Case 2: boxes from parent siblings (all must be in either neighbor or
 	//         interaction)
 	if(this->parent != NULL){
 		boxnow = this->parent;
@@ -205,7 +188,7 @@ void Box::printneighborlist()
 void Box::printinteractionlist()
 {
 	Node* now = this->interaction;
-	if(this->level==3 && this->i == 2 && this->j == 3){
+	//if(this->level==3 && this->i == 2 && this->j == 3){
 	int n=0;
 	while(now != NULL){
 		if(now->data == NULL)
@@ -220,7 +203,7 @@ void Box::printinteractionlist()
 		<<" on level "<<this->level
 		<<", #interaction boxes "<<n
 		<<endl;
-	}
+	//}
 }
 
 void performeaction(int action, Box* box)
