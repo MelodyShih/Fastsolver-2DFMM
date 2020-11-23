@@ -1,0 +1,9 @@
+----------------- Todo -------------------
+1. A function to sort inputs to pow(4,L) boxes
+2. Ground truth
+3. Build Tofo, Tifi, Tifo
+4. Downwardpass + computeoutcomingexp
+5. Upwardpass + computeincomingexp
+6. Function loop through all leaf nodes and build actual potential
+
+----------------- Done -------------------
