@@ -250,7 +250,7 @@ void Box::downwardpass(int action)
 	if(this->botleft == NULL){ 
 		return;
 	}
-	performeaction(action, this);
+	performeaction(action, this); //TODO this->computeincomingexp()
 	this->botleft ->downwardpass(action);
 	this->botright->downwardpass(action);
 	this->topleft ->downwardpass(action);
@@ -260,7 +260,7 @@ void Box::downwardpass(int action)
 void Box::upwardpass(int action)
 {
 	if(this->botleft == NULL){ 
-		performeaction(action, this);
+		performeaction(action, this); // TODO  this->computeoutgoingexp();
 		return;
 	}
 	this->botleft ->upwardpass(action);
@@ -272,25 +272,48 @@ void Box::upwardpass(int action)
 
 void Box::computeoutcomingexp()
 {
-	// Case 1: Box is on the leaf of the tree
+	// Case 1: Box is on the leaf of the tree (this->level == L-1)
 	// Apply outgoing-from-sources map T_tau^{ofs}, see (7.2)
 
 
 	// Case 2: Box is a parent of 4 nodes
 	// Apply outgoing from outgoing map T_tau^{ofo}, see (7.3)
 	// (get from looping through its child)
+	// this->topleft->T_tau^{ofo} x this->topleft->qhat
 }
 
 void Box::computeincomingexp()
 {
-	// Case 1: level 0
+	// Case 1: level 0, 1
 	// uhat = 0
 
 
-	// Case 2: all other levels
-	// Apply T_tau,parent^{ifi} to uhat_parent
+	// Case 2: all other levels (7.4) (7.5)
+	// Apply T_sigma,parent^{ifi} to uhat_parent
 
 
 	// Loop through all the boxes in the interaction list sigma
-	// Apply T_tau,sigma^{ifo} to qhat
+	// Apply T_sigma,interaction^{ifo} to qhat_interaction
+}
+
+void Box::buildTifi()
+{
+	//Theorem 7.2
+	//c_sigma (this): (this->cx, this->cy)
+	//c_tau (this->parent): (this->parent->cx, this->parent->cy)
+}
+
+void Box::buildTofo()
+{
+	//Theorem 7.1
+}
+
+void Box::buildTifo()
+{
+	//Theorem 6.26 
+	//Loop through all boxes in this->interaction
+	//now = this->interaction
+	//now->data->cx, now->data->cy
+	//now = now->next
+	//until now == NULL
 }

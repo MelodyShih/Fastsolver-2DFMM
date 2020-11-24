@@ -4,7 +4,9 @@ using namespace std;
 
 int main()
 {
-	int level=3;
+	// make N data
+	// double array : x, y, q
+	int level=3; //L, 0,1,2, ..., L-1
 	Box* rootbox = new Box(0,0,0,0);
 	rootbox->buildtree(level); 
 

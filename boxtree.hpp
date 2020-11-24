@@ -8,28 +8,34 @@ class Node
 	public:
 		Box    *data=NULL;
 		Node   *next=NULL;
-		double *Tifo_dat=NULL;	
+		double *Tifo_dat=NULL;// pxp matrix
 };
 
 class Box
 {
 	public:
-		int i;// c_tau has coordinate i*h_level, h_level= 1/(pow(2,level))
-		int j;
+		int i;// xcoo
+		      // c_tau has coordinate (i+0.5)*h_level, h_level= 1/(pow(2,level))
+		int j;// ycoo
+
+		double cx;
+		double cy;
+
 		int num;
 		int level;
 
-		double* q;
-		double* x;
-		double* y;
+		int* idxcharge; //q[idxcharge] mpoints
+		//double* q;
+		//double* x;
+		//double* y;
 
-		double* qhat;
-		double* uhat;
+		double* qhat; // px1 vector
+		double* uhat; // px1 vector
 
-		double* Tofo_mat; // on leaf, e.g. Tofo_mat is the map from
+		double* Tofo_mat; // pxp matrix, on leaf, e.g. Tofo_mat is the map from
 		// self (botleft) to its parent
-		double* Tifi_mat; // on leaf, i.e. Tifi_mat is the map from 
-		// parent to self	
+		double* Tifi_mat; // pxp matrix, on leaf, i.e. Tifi_mat is the map from 
+		                  // parent to self	
 
 		Box* parent;
 		Box* topleft;
@@ -63,8 +69,9 @@ class Box
 		void treetraverse(int action);
 		void downwardpass(int action);
 		void upwardpass(int action);
+		void buildactualpotential();
 
-		void computeoutcomingexp();
+		void computeoutcomingexp();//TODO: rename
 		void computeincomingexp();
 
 		void buildTofo();
