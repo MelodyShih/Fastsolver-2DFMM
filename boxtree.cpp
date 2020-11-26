@@ -220,7 +220,7 @@ void performeaction(int action, Box* box)
 			box->printinteractionlist();
 			break;
 		case 4:
-			box->computeoutcomingexp();	
+			box->computeoutgoingexp();	
 			break;
 		case 5:
 			box->computeincomingexp();	
@@ -270,7 +270,7 @@ void Box::upwardpass(int action)
 	performeaction(action, this);
 }
 
-void Box::computeoutcomingexp()
+void Box::computeoutgoingexp()
 {
 	// Case 1: Box is on the leaf of the tree (this->level == L-1)
 	// Apply outgoing-from-sources map T_tau^{ofs}, see (7.2)
