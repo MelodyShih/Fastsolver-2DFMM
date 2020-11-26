@@ -1,5 +1,7 @@
 #include <iostream> 
 #include <cmath> 
+#include <complex>
+
 using namespace std; 
 class Box;
 
@@ -8,7 +10,7 @@ class Node
 	public:
 		Box    *data=NULL;
 		Node   *next=NULL;
-		double *Tifo_dat=NULL;// pxp matrix
+		complex<double>* Tifo_dat=NULL;// pxp matrix
 };
 
 class Box
@@ -18,24 +20,22 @@ class Box
 		      // c_tau has coordinate (i+0.5)*h_level, h_level= 1/(pow(2,level))
 		int j;// ycoo
 
-		double cx;
-		double cy;
+		complex<double> c;
 
 		int num;
 		int level;
+		int p;
 
 		int* idxcharge; //q[idxcharge] mpoints
-		//double* q;
-		//double* x;
-		//double* y;
 
 		double* qhat; // px1 vector
 		double* uhat; // px1 vector
 
-		double* Tofo_mat; // pxp matrix, on leaf, e.g. Tofo_mat is the map from
+		complex<double>* Tofo_mat; // pxp matrix, on leaf, e.g. Tofo_mat is 
+		                           // the map from
 		// self (botleft) to its parent
-		double* Tifi_mat; // pxp matrix, on leaf, i.e. Tifi_mat is the map from 
-		                  // parent to self	
+		complex<double>* Tifi_mat; // pxp matrix, on leaf, i.e. Tifi_mat is 
+		                           // the map from parent to self	
 
 		Box* parent;
 		Box* topleft;
@@ -47,12 +47,13 @@ class Box
 		Node* neighbor;
 		Node* interaction;
 
-		Box(int level, int i, int j, int num)
+		Box(int level, int i, int j, int num, int p)
 		{
 			this->i = i;
 			this->j = j;
 			this->num = num;
 			this->level = level;
+			this->p = p;
 			this->parent   = NULL;
 			this->topleft  = NULL; 
 			this->topright = NULL; 

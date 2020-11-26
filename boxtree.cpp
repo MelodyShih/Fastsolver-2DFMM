@@ -1,4 +1,5 @@
 #include <iostream>
+#include <cmath>
 #include "boxtree.hpp"
 
 using namespace std;
@@ -20,16 +21,22 @@ void Box::buildtree(int numlevel)
 		return;
 	int i = this->i;
 	int j = this->j;
-	this->topleft  = new Box(this->level+1, 2*i+1, 2*j, 2);
+	int level = this->level;
+	int p = this->p;
+	double h = 1/pow(2, level);
+
+	this-> c = complex<double>((i+0.5)*h, (j+0.5)*h);
+
+	this->topleft  = new Box(this->level+1, 2*i+1, 2*j, 2, p);
 	this->topleft->parent = this;
 
-	this->topright = new Box(this->level+1, 2*i+1, 2*j+1, 3);
+	this->topright = new Box(this->level+1, 2*i+1, 2*j+1, 3, p);
 	this->topright->parent = this;
 
-	this->botleft  = new Box(this->level+1, 2*i, 2*j, 0);
+	this->botleft  = new Box(this->level+1, 2*i, 2*j, 0, p);
 	this->botleft->parent = this;
 
-	this->botright = new Box(this->level+1, 2*i, 2*j+1, 1);
+	this->botright = new Box(this->level+1, 2*i, 2*j+1, 1, p);
 	this->botright->parent = this;
 
 	this->topright->nextsibling = this->botleft;
@@ -220,10 +227,13 @@ void performeaction(int action, Box* box)
 			box->printinteractionlist();
 			break;
 		case 4:
-			box->computeoutgoingexp();	
+			box->buildTofo();	
 			break;
 		case 5:
-			box->computeincomingexp();	
+			box->buildTifi();	
+			break;
+		case 6:
+			box->buildTifo();	
 			break;
 		default: // code to be executed if n doesn't match any cases
 			for(int l=0; l<box->level; l++)
@@ -303,9 +313,42 @@ void Box::buildTifi()
 	//c_tau (this->parent): (this->parent->cx, this->parent->cy)
 }
 
+int fact(int n)
+{
+	// Returns factorial of n
+    int res = 1;
+    for (int i = 2; i <= n; i++)
+        res = res * i;
+    return res;
+}
+int nCr(int n, int r)
+{
+    return fact(n) / (fact(r) * fact(n - r));
+}
+
 void Box::buildTofo()
 {
+	if(this->level == 0) return; // do nothing for root box
 	//Theorem 7.1
+	complex<double> cparent = this->parent->c;
+	complex<double> c = this->c;
+
+	int p = this->p;
+	this->Tofo_mat = (complex<double>*) malloc(p*p * sizeof(complex<double>));
+	cout<<"Tofo for box " <<this->i<<","<<this->j<<" on level "<<this->level<<endl;
+	for(int j=0; j<p; j++){
+		for(int i=0; i<p; i++){
+			int idx = j*p+i;
+			if (i<=j){
+				this->Tofo_mat[idx] = (double) nCr(j,i)*
+					                        pow(cparent-c, j-i); 
+			}else{
+				this->Tofo_mat[idx] = complex<double>(0,0); 
+			}
+			cout<<this->Tofo_mat[idx]<<" ";
+		}
+		cout<<endl;
+	}
 }
 
 void Box::buildTifo()
