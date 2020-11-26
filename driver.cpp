@@ -42,7 +42,7 @@ int main(int argc, char *argv[])
 	//rootbox->treetraverse(1);//build neighborinterationlist
 	//rootbox->treetraverse(2);//print neighborlist
 	//rootbox->treetraverse(3);//print interactionlist
-	rootbox->treetraverse(4);//build neighborinterationlist
+	rootbox->treetraverse(4);//build Tofo
 
 	//cout<<"Downward pass:"<<endl;
 	//rootbox->downwardpass(0);
