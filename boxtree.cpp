@@ -65,7 +65,7 @@ void Box::buildneighborinteractionlist()
 			break;
 		}
 		push(&this->neighbor, boxnow->nextsibling);
-		boxnow = boxnow->nextsibling; 
+		boxnow = boxnow->nextsibling;
 	}
 
 	// Case 2: boxes from parent siblings (all must be in either neighbor or
@@ -109,7 +109,7 @@ void Box::buildneighborinteractionlist()
 				push(&this->interaction, boxtoadd);
 			}
 
-			boxnow = boxnow->nextsibling; 
+			boxnow = boxnow->nextsibling;
 		}
 
 		// Case 3: rest of them
@@ -128,7 +128,7 @@ void Box::buildneighborinteractionlist()
 							abs(this->parent->j - boxnow->j) <= 1){
 						//parent sibling's topleft
 						boxtoadd = boxnow->topleft;
-						if(abs(this->i-boxtoadd->i) <= 1 && 
+						if(abs(this->i-boxtoadd->i) <= 1 &&
 								abs(this->j-boxtoadd->j) <= 1){
 							push(&this->neighbor, boxtoadd);
 						}else{
@@ -137,7 +137,7 @@ void Box::buildneighborinteractionlist()
 
 						//topright
 						boxtoadd = boxnow->topright;
-						if(abs(this->i-boxtoadd->i) <= 1 && 
+						if(abs(this->i-boxtoadd->i) <= 1 &&
 								abs(this->j-boxtoadd->j) <= 1){
 							push(&this->neighbor, boxtoadd);
 						}else{
@@ -146,7 +146,7 @@ void Box::buildneighborinteractionlist()
 
 						//botleft
 						boxtoadd = boxnow->botleft;
-						if(abs(this->i-boxtoadd->i) <= 1 && 
+						if(abs(this->i-boxtoadd->i) <= 1 &&
 								abs(this->j-boxtoadd->j) <= 1){
 							push(&this->neighbor, boxtoadd);
 						}else{
@@ -155,7 +155,7 @@ void Box::buildneighborinteractionlist()
 
 						//botright
 						boxtoadd = boxnow->botright;
-						if(abs(this->i-boxtoadd->i) <= 1 && 
+						if(abs(this->i-boxtoadd->i) <= 1 &&
 								abs(this->j-boxtoadd->j) <= 1){
 							push(&this->neighbor, boxtoadd);
 						}else{
@@ -164,7 +164,7 @@ void Box::buildneighborinteractionlist()
 					}
 					boxnow = boxnow->nextsibling;
 				}
-				boxparentnow = boxparentnow->nextsibling; 
+				boxparentnow = boxparentnow->nextsibling;
 			}
 		}
 	}
@@ -227,13 +227,13 @@ void performeaction(int action, Box* box)
 			box->printinteractionlist();
 			break;
 		case 4:
-			box->buildTofo();	
+			box->buildTofo();
 			break;
 		case 5:
-			box->buildTifi();	
+			box->buildTifi();
 			break;
 		case 6:
-			box->buildTifo();	
+			box->buildTifo();
 			break;
 		default: // code to be executed if n doesn't match any cases
 			for(int l=0; l<box->level; l++)
@@ -244,7 +244,7 @@ void performeaction(int action, Box* box)
 
 void Box::treetraverse(int action)
 {
-	if(this->botleft == NULL){ 
+	if(this->botleft == NULL){
 		performeaction(action, this);
 		return;
 	}
@@ -257,7 +257,7 @@ void Box::treetraverse(int action)
 
 void Box::downwardpass(int action)
 {
-	if(this->botleft == NULL){ 
+	if(this->botleft == NULL){
 		return;
 	}
 	performeaction(action, this); //TODO this->computeincomingexp()
@@ -269,7 +269,7 @@ void Box::downwardpass(int action)
 
 void Box::upwardpass(int action)
 {
-	if(this->botleft == NULL){ 
+	if(this->botleft == NULL){
 		performeaction(action, this); // TODO  this->computeoutgoingexp();
 		return;
 	}
@@ -306,13 +306,6 @@ void Box::computeincomingexp()
 	// Apply T_sigma,interaction^{ifo} to qhat_interaction
 }
 
-void Box::buildTifi()
-{
-	//Theorem 7.2
-	//c_sigma (this): (this->cx, this->cy)
-	//c_tau (this->parent): (this->parent->cx, this->parent->cy)
-}
-
 int fact(int n)
 {
 	// Returns factorial of n
@@ -325,6 +318,34 @@ int nCr(int n, int r)
 {
     return fact(n) / (fact(r) * fact(n - r));
 }
+
+void Box::buildTifi()
+{
+	//Theorem 7.2
+	//c_sigma (this): (this->cx, this->cy)
+	//c_tau (this->parent): (this->parent->cx, this->parent->cy)
+	if(this->level < 3) return; // do nothing for box on level =0,1,2
+	complex<double> cparent = this->parent->c;
+	complex<double> c = this->c;
+
+	int p = this->p;
+	this->Tifi_mat = (complex<double>*) malloc(p*p * sizeof(complex<double>));
+	cout<<"Tifi for box " <<this->i<<","<<this->j<<" on level "<<this->level<<endl;
+	for(int j=0; j<p; j++){ // row
+		for(int i=0; i<p; i++){ //column
+			int idx = j*p+i;
+			if (i>=j){
+				this->Tifi_mat[idx] = (double) nCr(i,j)*
+																	pow(c-cparent, i-j);
+			}else{
+				this->Tifi_mat[idx] = complex<double>(0,0);
+			}
+			cout<<this->Tifi_mat[idx]<<" ";
+		}
+		cout<<endl;
+	}
+}
+
 
 void Box::buildTofo()
 {
@@ -341,9 +362,9 @@ void Box::buildTofo()
 			int idx = j*p+i;
 			if (i<=j){
 				this->Tofo_mat[idx] = (double) nCr(j,i)*
-					                        pow(cparent-c, j-i); 
+					                        pow(c-cparent, j-i);
 			}else{
-				this->Tofo_mat[idx] = complex<double>(0,0); 
+				this->Tofo_mat[idx] = complex<double>(0,0);
 			}
 			cout<<this->Tofo_mat[idx]<<" ";
 		}
@@ -353,7 +374,7 @@ void Box::buildTofo()
 
 void Box::buildTifo()
 {
-	//Theorem 6.26 
+	//Theorem 6.26
 	//Loop through all boxes in this->interaction
 	//now = this->interaction
 	//now->data->cx, now->data->cy
