@@ -5,6 +5,6 @@
 4. Downwardpass + computeoutgoingexp (Shanyin)
 5. Upwardpass + computeincomingexp (Shanyin)
 6. Function loop through all leaf nodes and build actual potential (page 74) (Ttfi, N_tau x p (above 6.26) Melody)
-7. rename computeoutcomingexp to computeoutcomingexp (Melody)
 
 ----------------- Done -------------------
+7. rename computeoutcomingexp to computeoutcomingexp (Melody)

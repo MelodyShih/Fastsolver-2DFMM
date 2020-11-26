@@ -71,7 +71,7 @@ class Box
 		void upwardpass(int action);
 		void buildactualpotential();
 
-		void computeoutcomingexp();//TODO: rename
+		void computeoutgoingexp();//TODO: rename
 		void computeincomingexp();
 
 		void buildTofo();
