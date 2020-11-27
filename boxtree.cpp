@@ -538,8 +538,8 @@ void Box::buildTifo()
 				int idx = j*p+i; //rowise
 				if (i==0) { // first column
 					if (j==0) { // first component
-						cout<<"c = "<<c<<", cinter"<<cinter<<endl;
-						now->Tifo_mat[idx] = log(c-cinter);
+						//cout<<"c = "<<c<<", cinter"<<cinter<<endl;
+						now->Tifo_mat[idx] = log(cinter-c);
 					}else{ // other components in first column
 						now->Tifo_mat[idx] = (double) (-1/j) * pow(cinter-c,-j);
 					}
