@@ -32,8 +32,8 @@ class Box
 		int ncharge;
 		int* idxcharge; //q[idxcharge] mpoints
 
-		double* qhat; // px1 vector
-		double* uhat; // px1 vector
+		complex<double>* qhat; // px1 vector
+		complex<double>* uhat; // px1 vector
 
 		complex<double>* Tofo_mat; // pxp matrix, on leaf, e.g. Tofo_mat is
 		                           // the map from
@@ -72,14 +72,14 @@ class Box
 		void printneighborlist();
 		void printinteractionlist();
 		void treetraverse(int action);
-		void assignidxtoleaf(int level, int** idxchargearray, 
+		void assignidxtoleaf(int level, int** idxchargearray,
 				             int* numchargeperleafbox);
 		void assignchargestobox(int totallevel, int N, complex<double>* x);
 		void downwardpass(int action);
 		void upwardpass(int action);
-		void buildactualpotential(int totallevel, complex<double>* x, 
+		void buildactualpotential(int totallevel, complex<double>* x,
 				                  double* q, double* uapprox);
-		void buildactualpotentialbox(complex<double>* x, 
+		void buildactualpotentialbox(complex<double>* x,
 				                     double* q, double* uapprox);
 
 		void computeoutgoingexp();//TODO: rename

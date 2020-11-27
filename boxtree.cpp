@@ -12,7 +12,7 @@ void printresult(int N, double* u){
 
 double G(complex<double> x, complex<double> y)
 {
-	double dis = sqrt(pow(x.real() - y.real(),2) + 
+	double dis = sqrt(pow(x.real() - y.real(),2) +
 			          pow(x.imag() - y.imag(),2));
 	return log(dis);
 }
@@ -322,7 +322,7 @@ void Box::assignidxtoleaf(int level, int** idxchargearray, int* numchargeperleaf
 		this->idxcharge = idxchargearray[idxbox];
 		this->ncharge = numchargeperleafbox[idxbox];
 #if 0
-		if(idxchargearray[idxbox][0] == -1) 
+		if(idxchargearray[idxbox][0] == -1)
 			return;
 		i = 0;
 		while(idxchargearray[idxbox][i] != -1){
@@ -366,20 +366,53 @@ void Box::upwardpass(int action)
 
 void Box::computeoutgoingexp()
 {
-	// Case 1: Box is on the leaf of the tree (this->level == L-1)
-	// Apply outgoing-from-sources map T_tau^{ofs}, see (7.2)
-
-
-	// Case 2: Box is a parent of 4 nodes
-	// Apply outgoing from outgoing map T_tau^{ofo}, see (7.3)
-	// (get from looping through its child)
-	// this->topleft->T_tau^{ofo} x this->topleft->qhat
+	int p = this->p;
+	this->qhat = (complex<double>*) malloc(p * sizeof(complex<double>));
+	if(this->level == L-1){
+		// Case 1: Box is on the leaf of the tree (this->level == L-1)
+		// Apply outgoing-from-sources map T_tau^{ofs}, see (7.2)
+		for(int j = 0; j<p; j++){ // row
+			this->qhat[j] = complex<double>(0,0);
+			for(int i = 0; i < this->num; i++){// for charges in this box
+					if(j==0){// first element
+						this->qhat[j] += q[this->idxcharge[j]]; // how to pass q?
+					}else{ // othere elements
+						this->qhat[j] += ( -1./ (double) j)
+													* pow(x[this->idxcharge[j]]- this->c, j)// how to pass x?
+													* q[this->idxcharge[j]] ;
+					}
+			}
+		}
+	}else{
+		// Case 2: Box is a parent of 4 nodes
+		// Apply outgoing from outgoing map T_tau^{ofo}, see (7.3)
+		// (get from looping through its child)
+		// this->topleft->T_tau^{ofo} x this->topleft->qhat
+		for(int j=0; j<p;j++){//row
+				this->qhat[j] = complex<double>(0,0);
+				for(int i=0; i<p; i++){//column
+					int idx = j*p+i;
+					this->qhat[j] += this->topleft->Tofo_mat[idx]*this->topleft->qhat[i];
+					this->qhat[j] += this->topright->Tofo_mat[idx]*this->topright->qhat[i];
+					this->qhat[j] += this->botleft->Tofo_mat[idx]*this->botleft->qhat[i];
+					this->qhat[j] += this->botright->Tofo_mat[idx]*this->botright->qhat[i];
+				}
+		}
+	}
 }
 
 void Box::computeincomingexp()
 {
-	// Case 1: level 0, 1
-	// uhat = 0
+	int p = this->p;
+	this->uhat = (complex<double>*) malloc(p * sizeof(complex<double>));
+	if(this->level <2){
+		// Case 1: level 0, 1
+		// uhat = 0
+		for(int j=0; j<p; j++){
+			this->uhat[j] = complex<double>(0,0);
+		}
+	}
+
 
 
 	// Case 2: all other levels (7.4) (7.5)
@@ -498,7 +531,7 @@ void Box::buildTifo()
 	}
 }
 
-void Box::buildactualpotentialbox(complex<double>* x, double* q, 
+void Box::buildactualpotentialbox(complex<double>* x, double* q,
 		                          double* uapprox)
 {
 	// A(I_tau, I_tau)q(I_tau)
@@ -507,7 +540,7 @@ void Box::buildactualpotentialbox(complex<double>* x, double* q,
 	for(int i=0; i<N; i++){
 		for(int j=0; j<N; j++){
 			if(i==j) continue;
-			uapprox[idxself[i]]+=G(x[idxself[i]],x[idxself[j]])*q[idxself[j]]; 
+			uapprox[idxself[i]]+=G(x[idxself[i]],x[idxself[j]])*q[idxself[j]];
 		}
 	}
 
@@ -521,11 +554,11 @@ void Box::buildactualpotentialbox(complex<double>* x, double* q,
 	    int* idxneig = bsigma->idxcharge;
 		for(int i=0; i<Nself; i++){
 			for(int j=0; j<Nneig; j++){
-				uapprox[idxself[i]]+=G(x[idxself[i]],x[idxneig[j]])*q[idxneig[j]]; 
+				uapprox[idxself[i]]+=G(x[idxself[i]],x[idxneig[j]])*q[idxneig[j]];
 			}
 		}
 		now = now->next;
-	}	
+	}
 }
 
 void Box::buildactualpotential(int totallevel, complex<double>* x, double* q,
