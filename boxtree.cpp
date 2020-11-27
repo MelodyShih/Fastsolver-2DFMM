@@ -304,7 +304,7 @@ void performaction(int action, Box* box)
 
 void Box::treetraverse(int action)
 {
-	if(this->botleft == NULL){ 
+	if(this->botleft == NULL){
 		performaction(action, this);
 		return;
 	}
@@ -353,7 +353,7 @@ void Box::downwardpass(int action)
 
 void Box::upwardpass(int action)
 {
-	if(this->botleft == NULL){ 
+	if(this->botleft == NULL){
 		performaction(action, this); // TODO  this->computeoutgoingexp();
 		return;
 	}
@@ -462,6 +462,40 @@ void Box::buildTifo()
 	//now->data->cx, now->data->cy
 	//now = now->next
 	//until now == NULL
+	if(this->level < 2) return; // do nothing for box on level =0,1
+
+	Node* now = this->interaction;
+	complex<double> c = this->c;
+	complex<double> cinter = now->data->c;
+	int p = this->p;
+
+	int n=0;
+	while(now != NULL){
+		if(now->data == NULL)
+			break;
+		now->Tifo_mat = (complex<double>*) malloc(p*p * sizeof(complex<double>));
+
+		for(int j=0; j<p; j++){ // row
+			for(int i=0; i<p; i++){ //column
+				int idx = j*p+i; //rowise
+				if (i==0) { // first column
+					if (j==0) { // first component
+						now->Tifo_mat[idx] = log(c-cinter);
+					}else{ // other components in first column
+						now->Tifo_mat[idx] = (double) (-1/j) * pow(cinter-c,-j);
+					}
+				}else{ // other columns
+					now->Tifo_mat[idx] = (double) pow(-1,i)* (double) nCr(i+j-1,i-1)
+					 														* pow(cinter-c, -i-j);
+				}
+			}
+		}
+
+		now = now->next;
+		cinter = now->data->c;
+		n++;
+
+	}
 }
 
 void Box::buildactualpotentialbox(complex<double>* x, double* q, 
