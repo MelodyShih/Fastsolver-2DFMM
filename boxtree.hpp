@@ -1,8 +1,8 @@
-#include <iostream> 
-#include <cmath> 
+#include <iostream>
+#include <cmath>
 #include <complex>
 
-using namespace std; 
+using namespace std;
 class Box;
 
 class Node
@@ -10,7 +10,7 @@ class Node
 	public:
 		Box    *data=NULL;
 		Node   *next=NULL;
-		complex<double>* Tifo_dat=NULL;// pxp matrix
+		complex<double>* Tifo_mat=NULL;// pxp matrix
 };
 
 class Box
@@ -31,11 +31,11 @@ class Box
 		double* qhat; // px1 vector
 		double* uhat; // px1 vector
 
-		complex<double>* Tofo_mat; // pxp matrix, on leaf, e.g. Tofo_mat is 
+		complex<double>* Tofo_mat; // pxp matrix, on leaf, e.g. Tofo_mat is
 		                           // the map from
 		// self (botleft) to its parent
-		complex<double>* Tifi_mat; // pxp matrix, on leaf, i.e. Tifi_mat is 
-		                           // the map from parent to self	
+		complex<double>* Tifi_mat; // pxp matrix, on leaf, i.e. Tifi_mat is
+		                           // the map from parent to self
 
 		Box* parent;
 		Box* topleft;
@@ -55,10 +55,10 @@ class Box
 			this->level = level;
 			this->p = p;
 			this->parent   = NULL;
-			this->topleft  = NULL; 
-			this->topright = NULL; 
-			this->botleft  = NULL; 
-			this->botright = NULL; 
+			this->topleft  = NULL;
+			this->topright = NULL;
+			this->botleft  = NULL;
+			this->botright = NULL;
 			this->nextsibling = NULL;
 			//cout<<"(level, num)=("<<level<<","<<i<<","<<j<<")"<<endl;
 		};
