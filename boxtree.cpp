@@ -292,7 +292,7 @@ void performaction(int action, Box* box)
 
 void Box::treetraverse(int action)
 {
-	if(this->botleft == NULL){ 
+	if(this->botleft == NULL){
 		performaction(action, this);
 		return;
 	}
@@ -308,7 +308,7 @@ void Box::assignidxtoleaf(int level, int** idxchargearray)
 	if(this->level == level){
 		int idxbox = this->i + this->j*(int)pow(2,level);
 		this->idxcharge = idxchargearray[idxbox];
-		if(idxchargearray[idxbox][0] == -1) 
+		if(idxchargearray[idxbox][0] == -1)
 			return;
 		i = 0;
 		while(idxchargearray[idxbox][i] != -1){
@@ -338,7 +338,7 @@ void Box::downwardpass(int action)
 
 void Box::upwardpass(int action)
 {
-	if(this->botleft == NULL){ 
+	if(this->botleft == NULL){
 		performeaction(action, this); // TODO  this->computeoutgoingexp();
 		return;
 	}
@@ -472,7 +472,7 @@ void Box::buildTifo()
 						now->data->Tifo_mat[idx] = (double) (-1/j) * pow(cinter-c,-j);
 					}
 				}else{ // other columns
-					now->data->Tifo_mat[idx] = (double) pow(-1,i)* (double) pow(i+j-1,i-1)
+					now->data->Tifo_mat[idx] = (double) pow(-1,i)* (double) nCr(i+j-1,i-1)
 					 														* pow(cinter-c, -i-j);
 				}
 			}
