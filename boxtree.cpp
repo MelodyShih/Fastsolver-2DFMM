@@ -439,7 +439,7 @@ void Box::computeincomingexp()
 			for(int j=0; j<p;j++){//row
 				for(int i=0; i<p; i++){//column
 					int idx = j*p+i;
-					this->uhat[j] += now->Tifo_mat[idx] * now->data->uhat[i];
+					this->uhat[j] += now->Tifo_mat[idx] * now->data->qhat[i];
 				}
 			}
 			now = now->next;
