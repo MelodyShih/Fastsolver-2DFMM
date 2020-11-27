@@ -36,8 +36,10 @@ int main(int argc, char *argv[])
 
 	complex<double>* x = (complex<double>*) malloc(N * sizeof(complex<double>)); 
 	double* q = (double*) malloc(N * sizeof(double)); 
-	complex<double>* utrue  =(complex<double>*) malloc(N * sizeof(complex<double>));
-	complex<double>* uapprox=(complex<double>*) malloc(N * sizeof(complex<double>));
+	complex<double>* utrue  =(complex<double>*) 
+		                                   malloc(N * sizeof(complex<double>));
+	complex<double>* uapprox=(complex<double>*) 
+		                                   malloc(N * sizeof(complex<double>));
 	
 	// make N data
 	// complex<double> array : x, y, q
@@ -53,8 +55,13 @@ int main(int argc, char *argv[])
 
 	Box* rootbox = new Box(rootlevel,0,0,rootnum,p);
 	rootbox->buildtree(totallevel); 
+	rootbox->treetraverse(1);//buildneighborinteractionlist
+	rootbox->treetraverse(4);//buildTofo
+	rootbox->treetraverse(5);//buildTifi
+	rootbox->treetraverse(6);//buildTifo
 	rootbox->assignchargestobox(totallevel, N, x);
-	
+	rootbox->upwardpass(totallevel, x, q);
+	rootbox->downwardpass();
 	rootbox->buildactualpotential(totallevel, x, q, uapprox);
 
 	cout<<"exact potential:"<<endl;

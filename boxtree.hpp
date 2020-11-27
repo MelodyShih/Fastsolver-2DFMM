@@ -53,11 +53,14 @@ class Box
 
 		Box(int level, int i, int j, int num, int p)
 		{
+			double h = 1/pow(2, level);
 			this->i = i;
 			this->j = j;
 			this->num = num;
 			this->level = level;
 			this->p = p;
+			this->c = complex<double>((i+0.5)*h, (j+0.5)*h);
+			
 			this->parent   = NULL;
 			this->topleft  = NULL;
 			this->topright = NULL;
@@ -75,14 +78,15 @@ class Box
 		void assignidxtoleaf(int level, int** idxchargearray,
 				             int* numchargeperleafbox);
 		void assignchargestobox(int totallevel, int N, complex<double>* x);
-		void downwardpass(int action);
-		void upwardpass(int action);
+		void downwardpass();
+		void upwardpass(int totallevel,complex<double>* x, double* q);
 		void buildactualpotential(int totallevel, complex<double>* x,
 				                  double* q, complex<double>* uapprox);
 		void buildactualpotentialbox(complex<double>* x,
 				                     double* q, complex<double>* uapprox);
 
-		void computeoutgoingexp();//TODO: rename
+		void computeoutgoingexp(int totallevel, complex<double>* x, 
+				                double* q);
 		void computeincomingexp();
 
 		void buildTofo();
