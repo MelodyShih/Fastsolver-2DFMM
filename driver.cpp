@@ -4,6 +4,7 @@
 #include "boxtree.hpp"
 
 #define rand01() ((double)rand()/RAND_MAX)
+
 using namespace std;
 
 int main(int argc, char *argv[])
@@ -26,23 +27,24 @@ int main(int argc, char *argv[])
 	double* q = (double*) malloc(N * sizeof(double)); 
 
 	// make N data
+	// complex<double> array : x, y, q
 	for(int i=0; i<N; i++){
 		x[i] = complex<double>(rand01(), rand01());	
 		q[i] = 10*rand01();
 		cout << x[i] << endl;
 	}
 
-	// double array : x, y, q
-	int totallevel=3; //L, 0,1,2, ..., L-1
+	int totallevel=3; //L, 0,1,2, ..., L-1, determine by number of charges
 	int rootlevel=0;
 	int rootnum=0;
 	Box* rootbox = new Box(rootlevel,0,0,rootnum,p);
 	rootbox->buildtree(totallevel); 
+	rootbox->assignchargestobox(totallevel, N, x);
 
 	//rootbox->treetraverse(1);//build neighborinterationlist
 	//rootbox->treetraverse(2);//print neighborlist
 	//rootbox->treetraverse(3);//print interactionlist
-	rootbox->treetraverse(4);//build Tofo
+	//rootbox->treetraverse(4);//build Tofo
 
 	//cout<<"Downward pass:"<<endl;
 	//rootbox->downwardpass(0);

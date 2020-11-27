@@ -1,5 +1,4 @@
 ----------------- Todo -------------------
-1. A function to sort inputs to pow(4,L) boxes (Melody)
 2. Ground truth (Melody)
 3. Build Tifi, Tifo (Shanyin, rowise) 
 4. Downwardpass + computeoutgoingexp (Shanyin)
@@ -9,3 +8,4 @@
 ----------------- Done -------------------
 7. rename computeoutcomingexp to computeoutcomingexp (Melody)
 3 (partial). Build Tofo
+1. A function to sort inputs to pow(4,L) boxes (Melody)

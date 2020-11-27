@@ -17,7 +17,7 @@ void push(Node** head_ref, Box* new_data)
 
 void Box::buildtree(int numlevel)
 {
-	if(numlevel==0)
+	if(numlevel==1)
 		return;
 	int i = this->i;
 	int j = this->j;
@@ -213,7 +213,55 @@ void Box::printinteractionlist()
 	//}
 }
 
-void performeaction(int action, Box* box)
+void Box::assignchargestobox(int totallevel, int N, complex<double>* x)
+{
+	int  numleafbox = (int) pow(4,totallevel-1);
+    int* idxcharge[numleafbox];
+    int* numchargeperleafbox = (int*) malloc(numleafbox*sizeof(int));
+    int* idxleafbox = (int*) malloc(numleafbox*sizeof(N));
+    double boxsize = 1/pow(2,totallevel-1);
+	cout <<"boxsize "<<boxsize<<endl;
+
+    for(int b=0; b<numleafbox; b++){
+        numchargeperleafbox[b] = 0.0;
+    }
+
+    for(int i=0; i<N; i++){
+        double cx = x[i].real();
+        double cy = x[i].imag();
+        int ix = floor(cx/boxsize);
+        int iy = floor(cy/boxsize);
+        int idxbox = iy*pow(2,totallevel-1) + ix;
+
+        idxleafbox[i] = numchargeperleafbox[idxbox];
+        numchargeperleafbox[idxbox] += 1;
+    }
+
+    for(int b=0; b<numleafbox; b++){
+        idxcharge[b] = (int*) malloc((numchargeperleafbox[b]+1)*sizeof(int));
+        idxcharge[b][numchargeperleafbox[b]] = -1;
+    }
+
+    for(int i=0; i<N; i++){
+        double cx = x[i].real();
+        double cy = x[i].imag();
+        int ix = floor(cx/boxsize);
+        int iy = floor(cy/boxsize);
+        int idxbox = iy*pow(2,totallevel-1) + ix;
+        idxcharge[idxbox][idxleafbox[i]] = i;
+    }
+#if 0
+    for(int b=0; b<numleafbox; b++){
+		for(int i=0; i<numchargeperleafbox[b]+1; i++){
+			cout << idxcharge[b][i]<<" ";
+		}
+		cout<<endl;
+    }
+#endif
+	this->assignidxtoleaf(totallevel-1, idxcharge);
+}
+
+void performaction(int action, Box* box)
 {
 	switch (action)
 	{
@@ -245,14 +293,35 @@ void performeaction(int action, Box* box)
 void Box::treetraverse(int action)
 {
 	if(this->botleft == NULL){ 
-		performeaction(action, this);
+		performaction(action, this);
 		return;
 	}
 	this->botleft->treetraverse(action);
 	this->botright->treetraverse(action);
 	this->topleft->treetraverse(action);
 	this->topright->treetraverse(action);
-	performeaction(action, this);
+	performaction(action, this);
+}
+
+void Box::assignidxtoleaf(int level, int** idxchargearray)
+{
+	if(this->level == level){
+		int idxbox = this->i + this->j*(int)pow(2,level);
+		this->idxcharge = idxchargearray[idxbox];
+		if(idxchargearray[idxbox][0] == -1) 
+			return;
+		i = 0;
+		while(idxchargearray[idxbox][i] != -1){
+			cout << this->idxcharge[i] << " ";
+			i++;
+		}
+		cout << endl;
+		return;
+	}
+	this->botleft ->assignidxtoleaf(level, idxchargearray);
+	this->botright->assignidxtoleaf(level, idxchargearray);
+	this->topleft ->assignidxtoleaf(level, idxchargearray);
+	this->topright->assignidxtoleaf(level, idxchargearray);
 }
 
 void Box::downwardpass(int action)
@@ -260,7 +329,7 @@ void Box::downwardpass(int action)
 	if(this->botleft == NULL){ 
 		return;
 	}
-	performeaction(action, this); //TODO this->computeincomingexp()
+	performaction(action, this); //TODO this->computeincomingexp()
 	this->botleft ->downwardpass(action);
 	this->botright->downwardpass(action);
 	this->topleft ->downwardpass(action);
@@ -270,14 +339,14 @@ void Box::downwardpass(int action)
 void Box::upwardpass(int action)
 {
 	if(this->botleft == NULL){ 
-		performeaction(action, this); // TODO  this->computeoutgoingexp();
+		performaction(action, this); // TODO  this->computeoutgoingexp();
 		return;
 	}
 	this->botleft ->upwardpass(action);
 	this->botright->upwardpass(action);
 	this->topleft ->upwardpass(action);
 	this->topright->upwardpass(action);
-	performeaction(action, this);
+	performaction(action, this);
 }
 
 void Box::computeoutgoingexp()
