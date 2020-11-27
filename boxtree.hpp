@@ -4,8 +4,8 @@
 
 using namespace std;
 
-double G(complex<double> x, complex<double> y);
-void printresult(int N, double* u);
+complex<double> G(complex<double> x, complex<double> y);
+void printresult(int N, complex<double>* u);
 
 class Box;
 class Node
@@ -78,9 +78,9 @@ class Box
 		void downwardpass(int action);
 		void upwardpass(int action);
 		void buildactualpotential(int totallevel, complex<double>* x,
-				                  double* q, double* uapprox);
+				                  double* q, complex<double>* uapprox);
 		void buildactualpotentialbox(complex<double>* x,
-				                     double* q, double* uapprox);
+				                     double* q, complex<double>* uapprox);
 
 		void computeoutgoingexp();//TODO: rename
 		void computeincomingexp();

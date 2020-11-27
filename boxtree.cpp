@@ -4,17 +4,23 @@
 
 using namespace std;
 
-void printresult(int N, double* u){
+void printresult(int N, complex<double>* u){
 	for(int i=0; i<N; i++){
 		cout<<u[i]<<endl;
 	}
 }
 
-double G(complex<double> x, complex<double> y)
+complex<double> G(complex<double> x, complex<double> y)
 {
+<<<<<<< HEAD
 	double dis = sqrt(pow(x.real() - y.real(),2) +
 			          pow(x.imag() - y.imag(),2));
 	return log(dis);
+=======
+	//double dis = sqrt(pow(x.real() - y.real(),2) +
+	//		          pow(x.imag() - y.imag(),2));
+	return log(abs(x-y));
+>>>>>>> 17641945f9c072eb884b1c4642a010d9dcb0fedd
 }
 
 /* Given a reference (pointer to pointer)
@@ -555,7 +561,7 @@ void Box::buildTifo()
 }
 
 void Box::buildactualpotentialbox(complex<double>* x, double* q,
-		                          double* uapprox)
+		                          complex<double>* uapprox)
 {
 	// A(I_tau, I_tau)q(I_tau)
 	int N = this->ncharge;
@@ -582,10 +588,18 @@ void Box::buildactualpotentialbox(complex<double>* x, double* q,
 		}
 		now = now->next;
 	}
+
+	// T^{tfi}_tau uhat_tau
+	//for(int i=0; i<N; i++){
+	//	for(int j=0; j<this->p; j++){
+	//		complex<double> ctau = this->c;
+	//		uapprox[idxself[i]]+=pow(this->x[idxself[i]]-this->c,j-1) * this->uhat[j];
+	//	}
+	//}
 }
 
 void Box::buildactualpotential(int totallevel, complex<double>* x, double* q,
-		                       double* uapprox)
+		                       complex<double>* uapprox)
 {
 	if(this->level == totallevel-1){
 		this->buildactualpotentialbox(x, q, uapprox);

@@ -7,18 +7,10 @@
 
 using namespace std;
 
-#if 0
-double G(complex<double> x, complex<double> y)
-{
-	double dis = sqrt(pow(x.real() - y.real(),2) + 
-			          pow(x.imag() - y.imag(),2));
-	return log(dis);
-}
-#endif
-
-void exact(int N, complex<double>* x, double* q, double* utrue)
+void exact(int N, complex<double>* x, double* q, complex<double>* utrue)
 {
 	for(int i=0; i<N; i++){
+		utrue[i] = complex<double>(0,0);
 		for(int j=0; j<N; j++){
 			if(i == j) continue;
 			utrue[i] = utrue[i] + G(x[i], x[j])*q[j]; 
@@ -44,8 +36,8 @@ int main(int argc, char *argv[])
 
 	complex<double>* x = (complex<double>*) malloc(N * sizeof(complex<double>)); 
 	double* q = (double*) malloc(N * sizeof(double)); 
-	double* utrue   = (double*) malloc(N * sizeof(double));
-	double* uapprox = (double*) malloc(N * sizeof(double));
+	complex<double>* utrue  =(complex<double>*) malloc(N * sizeof(complex<double>));
+	complex<double>* uapprox=(complex<double>*) malloc(N * sizeof(complex<double>));
 	
 	// make N data
 	// complex<double> array : x, y, q
