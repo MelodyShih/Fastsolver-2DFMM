@@ -405,22 +405,45 @@ void Box::computeincomingexp()
 {
 	int p = this->p;
 	this->uhat = (complex<double>*) malloc(p * sizeof(complex<double>));
-	if(this->level <2){
-		// Case 1: level 0, 1
-		// uhat = 0
-		for(int j=0; j<p; j++){
-			this->uhat[j] = complex<double>(0,0);
-		}
+	// Case 1: level 0, 1
+	// uhat = 0
+	for(int j=0; j<p; j++){
+		this->uhat[j] = complex<double>(0,0);
 	}
 
-
-
 	// Case 2: all other levels (7.4) (7.5)
-	// Apply T_sigma,parent^{ifi} to uhat_parent
+	if(this->level >=2){
+		// Apply T_sigma,parent^{ifi} to uhat_parent
+		if(this->level >=3){
+			for(int j=0; j<p;j++){//row
+				for(int i=0; i<p; i++){//column
+					int idx = j*p+i;
+					this->uhat[j] += this->Tifi_mat[idx]*this->parent->uhat[i];
+				}
+			}
+		}
+
+		// Loop through all the boxes in the interaction list sigma
+		// Apply T_sigma,interaction^{ifo} to qhat_interaction
+		Node* now = this->interaction;
+		int n=0;
+		while(now != NULL){
+			if(now->data == NULL)
+				break;
+			for(int j=0; j<p;j++){//row
+				for(int i=0; i<p; i++){//column
+					int idx = j*p+i;
+					this->uhat[j] += now->Tifo_mat[idx] * now->data->uhat[i];
+				}
+			}
+			now = now->next;
+			n++;
+		}
+	}
+}
 
 
-	// Loop through all the boxes in the interaction list sigma
-	// Apply T_sigma,interaction^{ifo} to qhat_interaction
+
 }
 
 int fact(int n)
