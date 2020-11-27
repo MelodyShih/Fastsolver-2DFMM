@@ -3,8 +3,11 @@
 #include <complex>
 
 using namespace std;
-class Box;
 
+double G(complex<double> x, complex<double> y);
+void printresult(int N, double* u);
+
+class Box;
 class Node
 {
 	public:
@@ -26,6 +29,7 @@ class Box
 		int level;
 		int p;
 
+		int ncharge;
 		int* idxcharge; //q[idxcharge] mpoints
 
 		double* qhat; // px1 vector
@@ -68,11 +72,15 @@ class Box
 		void printneighborlist();
 		void printinteractionlist();
 		void treetraverse(int action);
-		void assignidxtoleaf(int level, int** idxchargearray);
+		void assignidxtoleaf(int level, int** idxchargearray, 
+				             int* numchargeperleafbox);
 		void assignchargestobox(int totallevel, int N, complex<double>* x);
 		void downwardpass(int action);
 		void upwardpass(int action);
-		void buildactualpotential();
+		void buildactualpotential(int totallevel, complex<double>* x, 
+				                  double* q, double* uapprox);
+		void buildactualpotentialbox(complex<double>* x, 
+				                     double* q, double* uapprox);
 
 		void computeoutgoingexp();//TODO: rename
 		void computeincomingexp();

@@ -4,6 +4,19 @@
 
 using namespace std;
 
+void printresult(int N, double* u){
+	for(int i=0; i<N; i++){
+		cout<<u[i]<<endl;
+	}
+}
+
+double G(complex<double> x, complex<double> y)
+{
+	double dis = sqrt(pow(x.real() - y.real(),2) + 
+			          pow(x.imag() - y.imag(),2));
+	return log(dis);
+}
+
 /* Given a reference (pointer to pointer)
    to the head of a list and an int,
    inserts a new node  on the fr ont of the list. */
@@ -220,7 +233,6 @@ void Box::assignchargestobox(int totallevel, int N, complex<double>* x)
     int* numchargeperleafbox = (int*) malloc(numleafbox*sizeof(int));
     int* idxleafbox = (int*) malloc(numleafbox*sizeof(N));
     double boxsize = 1/pow(2,totallevel-1);
-	cout <<"boxsize "<<boxsize<<endl;
 
     for(int b=0; b<numleafbox; b++){
         numchargeperleafbox[b] = 0.0;
@@ -258,7 +270,7 @@ void Box::assignchargestobox(int totallevel, int N, complex<double>* x)
 		cout<<endl;
     }
 #endif
-	this->assignidxtoleaf(totallevel-1, idxcharge);
+	this->assignidxtoleaf(totallevel-1, idxcharge, numchargeperleafbox);
 }
 
 void performaction(int action, Box* box)
@@ -303,11 +315,13 @@ void Box::treetraverse(int action)
 	performaction(action, this);
 }
 
-void Box::assignidxtoleaf(int level, int** idxchargearray)
+void Box::assignidxtoleaf(int level, int** idxchargearray, int* numchargeperleafbox)
 {
 	if(this->level == level){
 		int idxbox = this->i + this->j*(int)pow(2,level);
 		this->idxcharge = idxchargearray[idxbox];
+		this->ncharge = numchargeperleafbox[idxbox];
+#if 0
 		if(idxchargearray[idxbox][0] == -1) 
 			return;
 		i = 0;
@@ -316,12 +330,13 @@ void Box::assignidxtoleaf(int level, int** idxchargearray)
 			i++;
 		}
 		cout << endl;
+#endif
 		return;
 	}
-	this->botleft ->assignidxtoleaf(level, idxchargearray);
-	this->botright->assignidxtoleaf(level, idxchargearray);
-	this->topleft ->assignidxtoleaf(level, idxchargearray);
-	this->topright->assignidxtoleaf(level, idxchargearray);
+	this->botleft ->assignidxtoleaf(level, idxchargearray, numchargeperleafbox);
+	this->botright->assignidxtoleaf(level, idxchargearray, numchargeperleafbox);
+	this->topleft ->assignidxtoleaf(level, idxchargearray, numchargeperleafbox);
+	this->topright->assignidxtoleaf(level, idxchargearray, numchargeperleafbox);
 }
 
 void Box::downwardpass(int action)
@@ -339,7 +354,7 @@ void Box::downwardpass(int action)
 void Box::upwardpass(int action)
 {
 	if(this->botleft == NULL){ 
-		performeaction(action, this); // TODO  this->computeoutgoingexp();
+		performaction(action, this); // TODO  this->computeoutgoingexp();
 		return;
 	}
 	this->botleft ->upwardpass(action);
@@ -404,8 +419,7 @@ void Box::buildTifi()
 		for(int i=0; i<p; i++){ //column
 			int idx = j*p+i;
 			if (i>=j){
-				this->Tifi_mat[idx] = (double) nCr(i,j)*
-																	pow(c-cparent, i-j);
+				this->Tifi_mat[idx] = (double) nCr(i,j)*pow(c-cparent, i-j);
 			}else{
 				this->Tifi_mat[idx] = complex<double>(0,0);
 			}
@@ -430,8 +444,7 @@ void Box::buildTofo()
 		for(int i=0; i<p; i++){
 			int idx = j*p+i;
 			if (i<=j){
-				this->Tofo_mat[idx] = (double) nCr(j,i)*
-					                        pow(c-cparent, j-i);
+				this->Tofo_mat[idx] = (double) nCr(j,i)*pow(c-cparent, j-i);
 			}else{
 				this->Tofo_mat[idx] = complex<double>(0,0);
 			}
@@ -449,4 +462,47 @@ void Box::buildTifo()
 	//now->data->cx, now->data->cy
 	//now = now->next
 	//until now == NULL
+}
+
+void Box::buildactualpotentialbox(complex<double>* x, double* q, 
+		                          double* uapprox)
+{
+	// A(I_tau, I_tau)q(I_tau)
+	int N = this->ncharge;
+	int* idxself = this->idxcharge;
+	for(int i=0; i<N; i++){
+		for(int j=0; j<N; j++){
+			if(i==j) continue;
+			uapprox[idxself[i]]+=G(x[idxself[i]],x[idxself[j]])*q[idxself[j]]; 
+		}
+	}
+
+	// A(I_tau, I_sigma)q(I_sigma) sigma is the neighbor of tau
+	Box* bsigma;
+	Node* now = this->neighbor;
+	while(now != NULL){
+		bsigma = this->neighbor->data;
+		int Nself = this->ncharge;
+		int Nneig = bsigma->ncharge;
+	    int* idxneig = bsigma->idxcharge;
+		for(int i=0; i<Nself; i++){
+			for(int j=0; j<Nneig; j++){
+				uapprox[idxself[i]]+=G(x[idxself[i]],x[idxneig[j]])*q[idxneig[j]]; 
+			}
+		}
+		now = now->next;
+	}	
+}
+
+void Box::buildactualpotential(int totallevel, complex<double>* x, double* q,
+		                       double* uapprox)
+{
+	if(this->level == totallevel-1){
+		this->buildactualpotentialbox(x, q, uapprox);
+		return;
+	}
+	this->botleft ->buildactualpotential(totallevel, x, q, uapprox);
+	this->botright->buildactualpotential(totallevel, x, q, uapprox);
+	this->topleft ->buildactualpotential(totallevel, x, q, uapprox);
+	this->topright->buildactualpotential(totallevel, x, q, uapprox);
 }
