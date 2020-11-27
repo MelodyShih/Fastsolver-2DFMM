@@ -68,6 +68,8 @@ class Box
 		void printneighborlist();
 		void printinteractionlist();
 		void treetraverse(int action);
+		void assignidxtoleaf(int level, int** idxchargearray);
+		void assignchargestobox(int totallevel, int N, complex<double>* x);
 		void downwardpass(int action);
 		void upwardpass(int action);
 		void buildactualpotential();
