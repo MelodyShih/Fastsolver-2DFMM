@@ -495,7 +495,7 @@ void Box::buildTofo()
 	complex<double> c = this->c;
 
 	int p = this->p;
-	this->Tofo_mat = (complex<double>*) malloc(p*p * sizeof(complex<double>));
+	this->Tofo_mat = (complex<double>*) malloc(p*p*sizeof(complex<double>));
 	//cout<<"Tofo for box " <<this->i<<","<<this->j<<" on level
 	//"<<this->level<<endl;
 	for(int j=0; j<p; j++){
@@ -539,7 +539,7 @@ void Box::buildTifo()
 				if (i==0) { // first column
 					if (j==0) { // first component
 						//cout<<"c = "<<c<<", cinter"<<cinter<<endl;
-						now->Tifo_mat[idx] = log(cinter-c);
+						now->Tifo_mat[idx] = log(c-cinter);
 					}else{ // other components in first column
 						now->Tifo_mat[idx] = (double) (-1/j) * pow(cinter-c,-j);
 					}
@@ -587,7 +587,7 @@ void Box::buildactualpotentialbox(complex<double>* x, double* q,
 		for(int j=0; j<this->p; j++){
 			complex<double> ctau = this->c;
 			//cout<<this->uhat[j]<<endl;
-			uapprox[idxself[i]]+=pow(x[idxself[i]]-this->c,j-1) * this->uhat[j];
+			uapprox[idxself[i]]+=pow(x[idxself[i]]-this->c,j) * this->uhat[j];
 		}
 	}
 }
