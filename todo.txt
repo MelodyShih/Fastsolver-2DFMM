@@ -1,11 +1,12 @@
 ----------------- Todo -------------------
-3. Build Tifi, Tifo (Shanyin, rowise) 
-4. Downwardpass + computeoutgoingexp (Shanyin)
-5. Upwardpass + computeincomingexp (Shanyin)
+8. Formula from tol --> p
 
 ----------------- Done -------------------
-7. rename computeoutcomingexp to computeoutcomingexp (Melody)
+7. Rename computeoutcomingexp to computeoutcomingexp (Melody)
 3 (partial). Build Tofo
 1. A function to sort inputs to pow(4,L) boxes (Melody)
 2. Ground truth (Melody)
 6. Function loop through all leaf nodes and build actual potential (page 74) (Ttfi, N_tau x p (above 6.26) Melody)
+3. Build Tifi, Tifo (Shanyin, rowise) 
+4. Downwardpass + computeoutgoingexp (Shanyin)
+5. Upwardpass + computeincomingexp (Shanyin)
