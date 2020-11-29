@@ -337,6 +337,7 @@ void Box::assignidxtoleaf(int level, int** idxchargearray, int* numchargeperleaf
 		this->idxcharge = idxchargearray[idxbox];
 		this->ncharge = numchargeperleafbox[idxbox];
 #if 0
+		cout<<this->i<<","<<this->j<<","<<this->ncharge<<endl;
 		if(idxchargearray[idxbox][0] == -1)
 			return;
 		i = 0;
@@ -370,7 +371,7 @@ void Box::downwardpass()
 void Box::upwardpass(int totallevel, complex<double>* x, double* q)
 {
 	if(this->botleft == NULL){
-		performaction(0, this);
+		//performaction(0, this);
 		this->computeoutgoingexp(totallevel, x, q);
 		return;
 	}
@@ -378,7 +379,7 @@ void Box::upwardpass(int totallevel, complex<double>* x, double* q)
 	this->botright->upwardpass(totallevel, x, q);
 	this->topleft ->upwardpass(totallevel, x, q);
 	this->topright->upwardpass(totallevel, x, q);
-	performaction(0, this);
+	//performaction(0, this);
 	this->computeoutgoingexp(totallevel, x, q);
 }
 
@@ -391,7 +392,7 @@ void Box::computeoutgoingexp(int totallevel, complex<double>* x, double* q)
 		// Apply outgoing-from-sources map T_tau^{ofs}, see (7.2)
 		for(int j = 0; j<p; j++){ // row
 			this->qhat[j] = complex<double>(0,0);
-			for(int i = 0; i < this->num; i++){// for charges in this box
+			for(int i = 0; i < this->ncharge; i++){// for charges in this box
 				if(j==0){// first element
 					this->qhat[j] += q[this->idxcharge[i]]; // how to pass q?
 				}else{ // othere elements
@@ -507,7 +508,6 @@ void Box::computeincomingexp()
 			for(int j=0; j<p;j++){//row
 				for(int i=0; i<p; i++){//column
 					int idx = j*p+i;
-					//cout <<"qhat"<<  now->data->qhat[i]<<endl;
 					this->uhat[j] += now->Tifo_mat[idx] * now->data->qhat[i];
 				}
 			}
@@ -529,7 +529,6 @@ void Box::buildTifi()
 
 	int p = this->p;
 	this->Tifi_mat = (complex<double>*) malloc(p*p * sizeof(complex<double>));
-	cout<<"Tifi for box " <<this->i<<","<<this->j<<" on level "<<this->level<<endl;
 	for(int j=0; j<p; j++){ // row
 		for(int i=0; i<p; i++){ //column
 			int idx = j*p+i;
@@ -538,9 +537,7 @@ void Box::buildTifi()
 			}else{
 				this->Tifi_mat[idx] = complex<double>(0,0);
 			}
-			cout<<this->Tifi_mat[idx]<<" ";
 		}
-		cout<<endl;
 	}
 }
 
@@ -554,7 +551,6 @@ void Box::buildTofo()
 
 	int p = this->p;
 	this->Tofo_mat = (complex<double>*) malloc(p*p*sizeof(complex<double>));
-	//cout<<"Tofo for box " <<this->i<<","<<this->j<<" on level"<<this->level<<endl;
 	for(int j=0; j<p; j++){
 		for(int i=0; i<p; i++){
 			int idx = j*p+i;
@@ -563,9 +559,7 @@ void Box::buildTofo()
 			}else{
 				this->Tofo_mat[idx] = complex<double>(0,0);
 			}
-			//cout<<this->Tofo_mat[idx]<<" ";
 		}
-		//cout<<endl;
 	}
 }
 
@@ -587,15 +581,12 @@ void Box::buildTifo()
 	while(now->data != NULL){
 		cinter = now->data->c;
 		now->Tifo_mat=(complex<double>*) malloc(p*p*sizeof(complex<double>));
-		//cout << "self"<<this->i<<","<<this->j<<")"
-		//	 <<"interaction box ("<<now->data->i<<","<<now->data->j<<")"<<endl;
 
 		for(int j=0; j<p; j++){ // row
 			for(int i=0; i<p; i++){ //column
 				int idx = j*p+i; //rowise
 				if (i==0) { // first column
 					if (j==0) { // first component
-						//cout<<"c = "<<c<<", cinter"<<cinter<<endl;
 						now->Tifo_mat[idx] = log(c-cinter);
 					}else{ // other components in first column
 						now->Tifo_mat[idx] = (double)(-1/(double)j)
@@ -642,6 +633,40 @@ void Box::buildactualpotentialbox(complex<double>* x, double* q,
 	//cout << endl;
 
 	// T^{tfi}_tau uhat_tau
+#ifdef DEBUG
+	int p = this->p;
+	now = this->interaction;
+	while(now->data != NULL){
+		bsigma = now->data;
+		int Nneig = bsigma->ncharge;
+		int* idxneig = bsigma->idxcharge;
+		for(int i=0; i<Nself; i++){
+			complex<double> approx(0,0);
+			complex<double> exact(0,0);
+			
+			for(int j=0; j<p; j++){
+				if(j==0){
+					approx+=log(x[idxself[i]]-bsigma->c)
+						*bsigma->qhat[j];
+					uapprox[idxself[i]]+=log(x[idxself[i]]-bsigma->c)
+						*bsigma->qhat[j];
+				}else{
+					approx+=pow(x[idxself[i]]-bsigma->c,-j)
+						*bsigma->qhat[j];
+					uapprox[idxself[i]]+=pow(x[idxself[i]]-bsigma->c,-j)
+						*bsigma->qhat[j];
+				}
+			}
+			//for(int j=0; j<Nneig; j++){
+			//	exact += G(x[idxself[i]],x[idxneig[j]])*q[idxneig[j]];
+			//	uapprox[idxself[i]]+=G(x[idxself[i]],x[idxneig[j]])*q[idxneig[j]];
+			//}
+			//cout << bsigma->i << ","<<bsigma->j<<endl;
+			//cout <<"Nneig"<<Nneig<<" exact = "<<exact<<", approx="<<approx<<endl;
+		}
+		now = now->next;
+	}
+#endif
 	for(int i=0; i<Nself; i++){
 		for(int j=0; j<this->p; j++){
 			complex<double> ctau = this->c;

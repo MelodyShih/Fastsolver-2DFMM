@@ -1,5 +1,5 @@
 CXX=g++
-CXXFLAGS=-std=c++11 -DDEBUG
+CXXFLAGS=-std=c++11
 
 HEADERS=boxtree.hpp
 

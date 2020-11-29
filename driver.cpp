@@ -26,16 +26,18 @@ int main(int argc, char *argv[])
 			"Arguments:\n"
 			"	N: number of charges\n"
 		    "   tol: tolerance\n"
-			"   totallevel: L\n");
+			"   totallevel: L\n"
+			"   p: p\n");
 		return 1;
 	}
 	int N;
 	sscanf(argv[1],"%d",&N);
 	double w, tol;
 	sscanf(argv[2],"%lf",&w); tol=(double)w;
-	int p = 4;
 	int totallevel;
 	sscanf(argv[3],"%d",&totallevel);
+	int p=4;
+	sscanf(argv[4],"%d",&p);
 
 	complex<double>* x = (complex<double>*) malloc(N * sizeof(complex<double>)); 
 	double* q = (double*) malloc(N * sizeof(double)); 
@@ -44,11 +46,26 @@ int main(int argc, char *argv[])
 	complex<double>* uapprox=(complex<double>*) 
 		                                   malloc(N * sizeof(complex<double>));
 	
+#if 0
+	// testing expansion of log
+	complex<double> xx(1.0, 0.0);
+	complex<double> yy(0.0, 0.2);
+	complex<double> cc(0.1, 0.1);
+	complex<double> approx(0.0, 0.0);
+	cout<<"exact:" << G(xx,yy)<<endl;
+	approx = G(xx,cc);
+	for(int j=1; j<p; j++){
+		approx += ( -1./ (double) j)*pow(yy-cc, j)*pow(xx-cc,-j);
+	}
+	cout<<"approx:"<<approx<<endl;
+#endif
+#if 1
 	// make N data
 	// complex<double> array : x, y, q
 	for(int i=0; i<N; i++){
 		x[i] = complex<double>(rand01(), rand01());	
-		q[i] = 10*rand01();
+		//q[i] = 10*rand01();
+		q[i] = 1.0;
 	}
 	exact(N, x, q, utrue);
 
@@ -71,6 +88,8 @@ int main(int argc, char *argv[])
 	rootbox->upwardpass(totallevel, x, q);
 	cout<<"downwardpass"<<endl;
 	rootbox->downwardpass();
+	//cout<<"printinteractionlist"<<endl;
+	//rootbox->treetraverse(3);//buildneighborinteractionlist
 	cout<<"build actual potential"<<endl;
 	rootbox->buildactualpotential(totallevel, x, q, uapprox);
 
@@ -79,5 +98,6 @@ int main(int argc, char *argv[])
 	cout<<endl;
 	cout<<"approximation:"<<endl;
 	printresult(N, uapprox);
+#endif
 	return 0;
 }
