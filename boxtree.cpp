@@ -288,7 +288,6 @@ void Box::assignchargestobox(int totallevel, int N, complex<double>* x)
 
         idxleafbox[i] = numchargeperleafbox[idxbox];
         numchargeperleafbox[idxbox] += 1;
-		//cout << "i="<<i<<", box("<<ix<<","<<iy<<"),"<<idxleafbox[i]<<endl;
     }
 
     for(int b=0; b<numleafbox; b++){
@@ -302,7 +301,6 @@ void Box::assignchargestobox(int totallevel, int N, complex<double>* x)
         int ix = floor(cx/boxsize);
         int iy = floor(cy/boxsize);
         int idxbox = (int) (iy*pow(2,totallevel-1) + ix);
-		//cout << "i="<<i<<", box("<<ix<<","<<iy<<"),"<<idxleafbox[i]<<endl;
         idxcharge[idxbox][idxleafbox[i]] = i;
     }
 #if 0
@@ -336,7 +334,7 @@ void Box::assignidxtoleaf(int level, int** idxchargearray, int* numchargeperleaf
 		int idxbox = this->i + this->j*(int)pow(2,level);
 		this->idxcharge = idxchargearray[idxbox];
 		this->ncharge = numchargeperleafbox[idxbox];
-#if 0
+#ifdef DEBUG
 		cout<<this->i<<","<<this->j<<","<<this->ncharge<<endl;
 		if(idxchargearray[idxbox][0] == -1)
 			return;
@@ -619,7 +617,6 @@ void Box::buildactualpotentialbox(complex<double>* x, double* q,
 	Box* bsigma;
 	Node* now = this->neighbor;
 	while(now->data != NULL){
-		//cout <<"("<< now->data->i<<","<<now->data->j<<")" <<endl;
 		bsigma = now->data;
 		int Nneig = bsigma->ncharge;
 	    int* idxneig = bsigma->idxcharge;
@@ -630,7 +627,6 @@ void Box::buildactualpotentialbox(complex<double>* x, double* q,
 		}
 		now = now->next;
 	}
-	//cout << endl;
 
 	// T^{tfi}_tau uhat_tau
 #ifdef DEBUG
