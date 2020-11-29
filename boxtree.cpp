@@ -262,8 +262,9 @@ void Box::assignchargestobox(int totallevel, int N, complex<double>* x)
 		//cout << "i="<<i<<", box("<<ix<<","<<iy<<"),"<<idxleafbox[i]<<endl;
         idxcharge[idxbox][idxleafbox[i]] = i;
     }
-#if 1
+#if 0
     for(int b=0; b<numleafbox; b++){
+		cout << "b="<<b<<endl;
 		for(int i=0; i<numchargeperleafbox[b]+1; i++){
 			cout << idxcharge[b][i]<<" ";
 		}
@@ -557,10 +558,10 @@ void Box::buildactualpotentialbox(complex<double>* x, double* q,
 		                          complex<double>* uapprox)
 {
 	// A(I_tau, I_tau)q(I_tau)
-	int N = this->ncharge;
+	int Nself = this->ncharge;
 	int* idxself = this->idxcharge;
-	for(int i=0; i<N; i++){
-		for(int j=0; j<N; j++){
+	for(int i=0; i<Nself; i++){
+		for(int j=0; j<Nself; j++){
 			if(i==j) continue;
 			uapprox[idxself[i]]+=G(x[idxself[i]],x[idxself[j]])*q[idxself[j]];
 		}
@@ -569,9 +570,9 @@ void Box::buildactualpotentialbox(complex<double>* x, double* q,
 	// A(I_tau, I_sigma)q(I_sigma) sigma is the neighbor of tau
 	Box* bsigma;
 	Node* now = this->neighbor;
-	while(now != NULL){
-		bsigma = this->neighbor->data;
-		int Nself = this->ncharge;
+	while(now->data != NULL){
+		//cout <<"("<< now->data->i<<","<<now->data->j<<")" <<endl;
+		bsigma = now->data;
 		int Nneig = bsigma->ncharge;
 	    int* idxneig = bsigma->idxcharge;
 		for(int i=0; i<Nself; i++){
@@ -581,9 +582,10 @@ void Box::buildactualpotentialbox(complex<double>* x, double* q,
 		}
 		now = now->next;
 	}
+	//cout << endl;
 
 	// T^{tfi}_tau uhat_tau
-	for(int i=0; i<N; i++){
+	for(int i=0; i<Nself; i++){
 		for(int j=0; j<this->p; j++){
 			complex<double> ctau = this->c;
 			//cout<<this->uhat[j]<<endl;
