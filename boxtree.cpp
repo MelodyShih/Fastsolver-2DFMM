@@ -29,7 +29,7 @@ complex<double> G(complex<double> x, complex<double> y)
 	//double dis = sqrt(pow(x.real() - y.real(),2) +
 	//		          pow(x.imag() - y.imag(),2));
 	//cout << abs(x-y) << endl;
-	return log(abs(x-y));
+	return log(x-y);
 }
 
 /* Given a reference (pointer to pointer)
@@ -504,8 +504,6 @@ void Box::computeincomingexp()
 		// Apply T_sigma,interaction^{ifo} to qhat_interaction
 		Node* now = this->interaction;
 		while(now->data != NULL){
-	//		if(now->data == NULL)
-	//			break;
 			for(int j=0; j<p;j++){//row
 				for(int i=0; i<p; i++){//column
 					int idx = j*p+i;
@@ -600,7 +598,8 @@ void Box::buildTifo()
 						//cout<<"c = "<<c<<", cinter"<<cinter<<endl;
 						now->Tifo_mat[idx] = log(c-cinter);
 					}else{ // other components in first column
-						now->Tifo_mat[idx] = (double) (-1/j) * pow(cinter-c,-j);
+						now->Tifo_mat[idx] = (double)(-1/(double)j)
+							                              *pow(cinter-c,-j); 
 					}
 				}else{ // other columns
 					now->Tifo_mat[idx] = (double) pow(-1,i)* 
