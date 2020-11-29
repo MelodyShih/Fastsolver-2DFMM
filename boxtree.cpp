@@ -4,6 +4,20 @@
 
 using namespace std;
 
+int fact(int n)
+{
+	// Returns factorial of n
+    int res = 1;
+    for (int i = 2; i <= n; i++)
+        res = res * i;
+    return res;
+}
+
+int nCr(int n, int r)
+{
+    return fact(n) / (fact(r) * fact(n - r));
+}
+
 void printresult(int N, complex<double>* u){
 	for(int i=0; i<N; i++){
 		cout<<u[i]<<endl;
@@ -27,6 +41,35 @@ void push(Node** head_ref, Box* new_data)
 	new_node->data = new_data;
 	new_node->next = (*head_ref);
 	(*head_ref) = new_node;
+}
+
+void performaction(int action, Box* box)
+{
+	switch (action)
+	{
+		case 1:
+			box->buildneighborinteractionlist();
+			break;
+		case 2:
+			box->printneighborlist();
+			break;
+		case 3:
+			box->printinteractionlist();
+			break;
+		case 4:
+			box->buildTofo();
+			break;
+		case 5:
+			box->buildTifi();
+			break;
+		case 6:
+			box->buildTifo();
+			break;
+		default: // code to be executed if n doesn't match any cases
+			for(int l=0; l<box->level; l++)
+				cout<<"  ";
+			cout<<"box ("<<box->i<<","<<box->j<<")"<<endl;
+	}
 }
 
 void Box::buildtree(int numlevel)
@@ -274,35 +317,6 @@ void Box::assignchargestobox(int totallevel, int N, complex<double>* x)
 	this->assignidxtoleaf(totallevel-1, idxcharge, numchargeperleafbox);
 }
 
-void performaction(int action, Box* box)
-{
-	switch (action)
-	{
-		case 1:
-			box->buildneighborinteractionlist();
-			break;
-		case 2:
-			box->printneighborlist();
-			break;
-		case 3:
-			box->printinteractionlist();
-			break;
-		case 4:
-			box->buildTofo();
-			break;
-		case 5:
-			box->buildTifi();
-			break;
-		case 6:
-			box->buildTifo();
-			break;
-		default: // code to be executed if n doesn't match any cases
-			for(int l=0; l<box->level; l++)
-				cout<<"  ";
-			cout<<"box ("<<box->i<<","<<box->j<<")"<<endl;
-	}
-}
-
 void Box::treetraverse(int action)
 {
 	if(this->botleft == NULL){
@@ -356,6 +370,7 @@ void Box::downwardpass()
 void Box::upwardpass(int totallevel, complex<double>* x, double* q)
 {
 	if(this->botleft == NULL){
+		performaction(0, this);
 		this->computeoutgoingexp(totallevel, x, q);
 		return;
 	}
@@ -363,6 +378,7 @@ void Box::upwardpass(int totallevel, complex<double>* x, double* q)
 	this->botright->upwardpass(totallevel, x, q);
 	this->topleft ->upwardpass(totallevel, x, q);
 	this->topright->upwardpass(totallevel, x, q);
+	performaction(0, this);
 	this->computeoutgoingexp(totallevel, x, q);
 }
 
@@ -377,11 +393,11 @@ void Box::computeoutgoingexp(int totallevel, complex<double>* x, double* q)
 			this->qhat[j] = complex<double>(0,0);
 			for(int i = 0; i < this->num; i++){// for charges in this box
 				if(j==0){// first element
-					this->qhat[j] += q[this->idxcharge[j]]; // how to pass q?
+					this->qhat[j] += q[this->idxcharge[i]]; // how to pass q?
 				}else{ // othere elements
 					this->qhat[j] += ( -1./ (double) j)
-								 *pow(x[this->idxcharge[j]]-this->c, j)
-								 *q[this->idxcharge[j]] ;
+								 *pow(x[this->idxcharge[i]]-this->c, j)
+								 *q[this->idxcharge[i]] ;
 				}
 			}
 		}
@@ -394,16 +410,71 @@ void Box::computeoutgoingexp(int totallevel, complex<double>* x, double* q)
 				this->qhat[j] = complex<double>(0,0);
 				for(int i=0; i<p; i++){//column
 					int idx = j*p+i;
+					double scale = (i==0? 1: -i);
 					this->qhat[j] +=
-						this->topleft->Tofo_mat[idx]*this->topleft->qhat[i];
+						this->topleft->Tofo_mat[idx]*this->topleft->qhat[i]*scale;
 					this->qhat[j] +=
-						this->topright->Tofo_mat[idx]*this->topright->qhat[i];
+						this->topright->Tofo_mat[idx]*this->topright->qhat[i]*scale;
 					this->qhat[j] +=
-						this->botleft->Tofo_mat[idx]*this->botleft->qhat[i];
+						this->botleft->Tofo_mat[idx]*this->botleft->qhat[i]*scale;
 					this->qhat[j] +=
-						this->botright->Tofo_mat[idx]*this->botright->qhat[i];
+						this->botright->Tofo_mat[idx]*this->botright->qhat[i]*scale;
 				}
+				this->qhat[j] = (double)(j==0?1:-1/(double)j)*this->qhat[j];
 		}
+#ifdef DEBUG
+		if(this->level == totallevel-2){
+			complex<double>* qhat = 
+				(complex<double>*) malloc(p * sizeof(complex<double>));
+			for(int j = 0; j<p; j++){ // row
+				qhat[j] = complex<double>(0,0);
+				Box* child = this->topleft;
+				for(int i = 0; i < child->num; i++){// for charges in this box
+					if(j==0){// first element
+						qhat[j] += q[child->idxcharge[i]]; // how to pass q?
+					}else{ // othere elements
+						qhat[j] += ( -1./ (double) j)
+									 *pow(x[child->idxcharge[i]]-this->c, j)
+									 *q[child->idxcharge[i]] ;
+					}
+				}
+				child = this->topright;
+				for(int i = 0; i < child->num; i++){// for charges in this box
+					if(j==0){// first element
+						qhat[j] += q[child->idxcharge[i]]; // how to pass q?
+					}else{ // othere elements
+						qhat[j] += ( -1./ (double) j)
+									 *pow(x[child->idxcharge[i]]-this->c, j)
+									 *q[child->idxcharge[i]] ;
+					}
+				}
+				child = this->botleft;
+				for(int i = 0; i < child->num; i++){// for charges in this box
+					if(j==0){// first element
+						qhat[j] += q[child->idxcharge[i]]; // how to pass q?
+					}else{ // othere elements
+						qhat[j] += ( -1./ (double) j)
+									 *pow(x[child->idxcharge[i]]-this->c, j)
+									 *q[child->idxcharge[i]] ;
+					}
+				}
+				child = this->botright;
+				for(int i = 0; i < child->num; i++){// for charges in this box
+					if(j==0){// first element
+						qhat[j] += q[child->idxcharge[i]]; // how to pass q?
+					}else{ // othere elements
+						qhat[j] += ( -1./ (double) j)
+									 *pow(x[child->idxcharge[i]]-this->c, j)
+									 *q[child->idxcharge[i]] ;
+					}
+				}
+			}
+			for(int i=0; i<p; i++){
+				cout << "(qtrue, qest) = ("<<qhat[i]<<","<<this->qhat[i]<<")"<<endl;
+			}
+			delete[] qhat;
+		}
+#endif
 	}
 }
 
@@ -448,18 +519,6 @@ void Box::computeincomingexp()
 }
 
 
-int fact(int n)
-{
-	// Returns factorial of n
-    int res = 1;
-    for (int i = 2; i <= n; i++)
-        res = res * i;
-    return res;
-}
-int nCr(int n, int r)
-{
-    return fact(n) / (fact(r) * fact(n - r));
-}
 
 void Box::buildTifi()
 {
@@ -497,8 +556,7 @@ void Box::buildTofo()
 
 	int p = this->p;
 	this->Tofo_mat = (complex<double>*) malloc(p*p*sizeof(complex<double>));
-	//cout<<"Tofo for box " <<this->i<<","<<this->j<<" on level
-	//"<<this->level<<endl;
+	//cout<<"Tofo for box " <<this->i<<","<<this->j<<" on level"<<this->level<<endl;
 	for(int j=0; j<p; j++){
 		for(int i=0; i<p; i++){
 			int idx = j*p+i;

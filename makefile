@@ -1,5 +1,5 @@
 CXX=g++
-CXXFLAGS=-std=c++11
+CXXFLAGS=-std=c++11 -DDEBUG
 
 HEADERS=boxtree.hpp
 
@@ -7,5 +7,8 @@ HEADERS=boxtree.hpp
 	$(CXX) -c $(CXXFLAGS) $(INC) $< -o $@
 
 driver: driver.o boxtree.o 
-	$(CXX) driver.o boxtree.o -o driver
+	$(CXX) $(CXXFLAGS) driver.o boxtree.o -o driver
 
+clean:
+	rm *.o
+	rm driver
