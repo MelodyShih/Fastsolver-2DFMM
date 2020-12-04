@@ -19,31 +19,31 @@ void exact(int N, complex<double>* x, double* q, complex<double>* utrue)
 }
 
 double norm_inf_vec(int N, complex<double>* utrue)
-{ // compute the L_inf norm of a complex vector
+{ // compute the L_inf norm
 	double norm_inf = 0;
 	for(int i=0; i<N; i++){
-			if(abs(utrue[i]) > norm_inf){
-				norm_inf = abs(utrue[i]);
+			if(abs(utrue[i].real()) > norm_inf){
+				norm_inf = abs(utrue[i].real());
 			}
 	}
 	return norm_inf;
 }
 
 double norm_two_vec(int N, complex<double>* utrue)
-{ // compute the L2 norm of a complex vector
+{ // compute the L2 norm
 	double norm2 = 0;
 	for(int i=0; i<N; i++){
-		norm2 += norm(utrue[i]);
+		norm2 += pow(utrue[i].real(), 2);
 	}
-	return pow(norm2,0.5);
+	return pow(norm2, 0.5);
 }
 
 double norm_inf_diff(int N, complex<double>* utrue, complex<double>* uapprox)
-{ // compute the L_inf norm of difference between two complex vectors
+{ // compute the L_inf norm of difference between two vectors
 	double norm_inf = 0;
 	for(int i=0; i<N; i++){
-			if(abs(utrue[i]-uapprox[i]) > norm_inf){
-				norm_inf = abs(utrue[i]-uapprox[i]);
+			if(abs(utrue[i].real()-uapprox[i].real()) > norm_inf){
+				norm_inf = abs(utrue[i].real()-uapprox[i].real());
 			}
 	}
 	return norm_inf;
@@ -53,7 +53,7 @@ double norm_two_diff(int N, complex<double>* utrue, complex<double>* uapprox)
 { // compute the L2 norm of difference between two complex vectors
 	double norm2 = 0;
 	for(int i=0; i<N; i++){
-		norm2 += norm(utrue[i]-uapprox[i]);
+		norm2 += pow(utrue[i].real()-uapprox[i].real(), 2);
 	}
 	return pow(norm2,0.5);
 }
@@ -149,10 +149,10 @@ int main(int argc, char *argv[])
 	cout<<"approximation:"<<endl;
 	printresult(N, uapprox);
 
-	// double norm_true = norm_inf_vec(N, utrue);
-	// double norm_diff = norm_inf_diff(N, utrue, uapprox);
-	double norm_true = norm_two_vec(N, utrue);
-	double norm_diff = norm_two_diff(N, utrue, uapprox);
+	double norm_true = norm_inf_vec(N, utrue);
+	double norm_diff = norm_inf_diff(N, utrue, uapprox);
+	// double norm_true = norm_two_vec(N, utrue);
+	// double norm_diff = norm_two_diff(N, utrue, uapprox);
 	double rel_err = norm_diff/norm_true;
 
 	cout<<"p: "<<p<<endl;
