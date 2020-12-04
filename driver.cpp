@@ -13,10 +13,40 @@ void exact(int N, complex<double>* x, double* q, complex<double>* utrue)
 		utrue[i] = complex<double>(0,0);
 		for(int j=0; j<N; j++){
 			if(i == j) continue;
-			utrue[i] = utrue[i] + G(x[i], x[j])*q[j]; 
+			utrue[i] = utrue[i] + G(x[i], x[j])*q[j];
 		}
 	}
 }
+
+double norm_inf_vec(int N, complex<double>* utrue)
+{ // compute the L_inf norm of a complex vector
+	double norm_inf = 0;
+	for(int i=0; i<N; i++){
+			if(abs(utrue[i]) > norm_inf){
+				norm_inf = abs(utrue[i]);
+			}
+	}
+	return norm_inf;
+}
+
+double norm_inf_diff(int N, complex<double>* utrue, complex<double>* uapprox)
+{ // compute the L_inf norm of difference between two complex vectors
+	double norm_inf = 0;
+	for(int i=0; i<N; i++){
+			if(abs(utrue[i]-uapprox[i]) > norm_inf){
+				norm_inf = abs(utrue[i]-uapprox[i]);
+			}
+	}
+	return norm_inf;
+}
+
+int chooseP(double tol)
+{ // compute length P given tolerance
+	int p = (int) round(log(tol)/log(pow(2,0.5)/(4-pow(2,0.5))));
+	return p;
+}
+
+
 
 int main(int argc, char *argv[])
 {
@@ -27,7 +57,8 @@ int main(int argc, char *argv[])
 			"	N: number of charges\n"
 		    "   tol: tolerance\n"
 			"   totallevel: L\n"
-			"   p: p\n");
+			// "   p: p\n"
+		);
 		return 1;
 	}
 	int N;
@@ -36,16 +67,17 @@ int main(int argc, char *argv[])
 	sscanf(argv[2],"%lf",&w); tol=(double)w;
 	int totallevel;
 	sscanf(argv[3],"%d",&totallevel);
-	int p=4;
-	sscanf(argv[4],"%d",&p);
+	// int p=4;
+	// sscanf(argv[4],"%d",&p);
+	int p = chooseP(tol);
 
-	complex<double>* x = (complex<double>*) malloc(N * sizeof(complex<double>)); 
-	double* q = (double*) malloc(N * sizeof(double)); 
-	complex<double>* utrue  =(complex<double>*) 
+	complex<double>* x = (complex<double>*) malloc(N * sizeof(complex<double>));
+	double* q = (double*) malloc(N * sizeof(double));
+	complex<double>* utrue  =(complex<double>*)
 		                                   malloc(N * sizeof(complex<double>));
-	complex<double>* uapprox=(complex<double>*) 
+	complex<double>* uapprox=(complex<double>*)
 		                                   malloc(N * sizeof(complex<double>));
-	
+
 #if 0
 	// testing expansion of log
 	complex<double> xx(1.0, 0.0);
@@ -63,7 +95,7 @@ int main(int argc, char *argv[])
 	// make N data
 	// complex<double> array : x, y, q
 	for(int i=0; i<N; i++){
-		x[i] = complex<double>(rand01(), rand01());	
+		x[i] = complex<double>(rand01(), rand01());
 		//q[i] = 10*rand01();
 		q[i] = 1.0;
 	}
@@ -73,7 +105,7 @@ int main(int argc, char *argv[])
 	int rootnum=0;
 
 	Box* rootbox = new Box(rootlevel,0,0,rootnum,p);
-	rootbox->buildtree(totallevel); 
+	rootbox->buildtree(totallevel);
 	cout<<"buildneighborinteractionlist"<<endl;
 	rootbox->treetraverse(1);//buildneighborinteractionlist
 	cout<<"buildTofo"<<endl;
@@ -98,6 +130,13 @@ int main(int argc, char *argv[])
 	cout<<endl;
 	cout<<"approximation:"<<endl;
 	printresult(N, uapprox);
+
+	double norm_true = norm_inf_vec(N, utrue);
+	double norm_diff = norm_inf_diff(N, utrue, uapprox);
+	double rel_err = norm_diff/norm_true;
+
+	cout<<"p: "<<p<<endl;
+	cout<<"relative error: "<<rel_err<<", tol="<<tol<<endl;
 #endif
 	return 0;
 }
