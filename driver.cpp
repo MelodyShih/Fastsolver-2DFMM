@@ -18,6 +18,18 @@ void exact(int N, complex<double>* x, double* q, complex<double>* utrue)
 	}
 }
 
+double exact_one(int N, complex<double>* x, double* q, int i)
+{// exact real part of certain utrue[i]
+		complex<double> utruei = complex<double>(0,0);
+		for(int j=0; j<N; j++){
+			if(i == j) continue;
+			utruei = utruei + G(x[i], x[j])*q[j];
+		}
+		// cout<<"true u[idx]:"<<utruei<<endl;
+		double utrueireal = utruei.real();
+	return utrueireal;
+}
+
 double norm_inf_vec(int N, complex<double>* utrue)
 { // compute the L_inf norm
 	double norm_inf = 0;
@@ -117,7 +129,7 @@ int main(int argc, char *argv[])
 		//q[i] = 10*rand01();
 		q[i] = 1.0;
 	}
-	exact(N, x, q, utrue);
+	// exact(N, x, q, utrue);
 
 	int rootlevel=0;
 	int rootnum=0;
@@ -143,17 +155,26 @@ int main(int argc, char *argv[])
 	cout<<"build actual potential"<<endl;
 	rootbox->buildactualpotential(totallevel, x, q, uapprox);
 
-	cout<<"exact potential:"<<endl;
-	printresult(N, utrue);
-	cout<<endl;
+	// cout<<"exact potential:"<<endl;
+	// printresult(N, utrue);
+	// cout<<endl;
 	cout<<"approximation:"<<endl;
 	printresult(N, uapprox);
 
-	double norm_true = norm_inf_vec(N, utrue);
-	double norm_diff = norm_inf_diff(N, utrue, uapprox);
+// // use the whole list
+	// double norm_true = norm_inf_vec(N, utrue);
+	// double norm_diff = norm_inf_diff(N, utrue, uapprox);
 	// double norm_true = norm_two_vec(N, utrue);
 	// double norm_diff = norm_two_diff(N, utrue, uapprox);
+
+	// use one xi
+	int idx = 0;
+	double norm_true = abs(exact_one(N, x, q, idx));
+	double norm_diff = abs(exact_one(N, x, q, idx)-uapprox[idx].real());
+
 	double rel_err = norm_diff/norm_true;
+
+	cout<<"norm_true: "<<norm_true<<", norm_diff: "<<norm_diff<<endl;
 
 	cout<<"p: "<<p<<endl;
 	cout<<"relative error: "<<rel_err<<", tol="<<tol<<endl;
