@@ -1,5 +1,6 @@
 #include <iostream>
 #include <cmath>
+#include <assert.h>
 #include "boxtree.hpp"
 
 using namespace std;
