@@ -162,13 +162,14 @@ int main(int argc, char *argv[])
 	printresult(N, uapprox);
 
 // // use the whole list
-	// double norm_true = norm_inf_vec(N, utrue);
-	// double norm_diff = norm_inf_diff(N, utrue, uapprox);
-	// double norm_true = norm_two_vec(N, utrue);
-	// double norm_diff = norm_two_diff(N, utrue, uapprox);
+// 	double norm_true = norm_inf_vec(N, utrue);
+// 	double norm_diff = norm_inf_diff(N, utrue, uapprox);
+// 	// double norm_true = norm_two_vec(N, utrue);
+// 	// double norm_diff = norm_two_diff(N, utrue, uapprox);
 
 	// use one xi
-	int idx = 0;
+	int idx = rand() % N;
+	cout<<"idx: "<<idx<<endl;
 	double norm_true = abs(exact_one(N, x, q, idx));
 	double norm_diff = abs(exact_one(N, x, q, idx)-uapprox[idx].real());
 
