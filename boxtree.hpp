@@ -4,8 +4,6 @@
 
 using namespace std;
 
-complex<double> G(complex<double> x, complex<double> y);
-void printresult(int N, complex<double>* u);
 
 class Box;
 class Node

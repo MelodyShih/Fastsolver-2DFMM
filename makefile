@@ -6,8 +6,8 @@ HEADERS=boxtree.hpp
 %.o: %.cpp $(HEADERS)
 	$(CXX) -c $(CXXFLAGS) $(INC) $< -o $@
 
-driver: driver.o boxtree.o 
-	$(CXX) $(CXXFLAGS) driver.o boxtree.o -o driver
+driver: driver.o boxtree.o utils.o 
+	$(CXX) $(CXXFLAGS) driver.o boxtree.o utils.o -o driver
 
 clean:
 	rm *.o
